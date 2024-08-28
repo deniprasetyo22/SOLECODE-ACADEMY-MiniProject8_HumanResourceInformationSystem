@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MiniProject5.Application.DTOs;
 using MiniProject5.Application.Interfaces.IServices;
@@ -6,6 +7,7 @@ using MiniProject5.Persistence.Models;
 
 namespace MiniProject5.WebAPI.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class EmployeeController : ControllerBase
@@ -17,6 +19,7 @@ namespace MiniProject5.WebAPI.Controllers
             _employeeService = employeeService;
         }
 
+        [Authorize(Roles = "Administrator, HR Manager, Department Manager, Employee Supervisor, Employee")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Employee>>> GetAllEmployees([FromQuery] paginationDto pagination)
         {

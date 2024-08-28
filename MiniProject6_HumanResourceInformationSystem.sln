@@ -5,17 +5,17 @@ VisualStudioVersion = 17.10.35122.118
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{99AFAF91-5093-4557-A4FF-31208B082A3C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MiniProject5.Domain", "MiniProject5.Domain\MiniProject5.Domain.csproj", "{27E5BB3F-B25C-4EFE-AA0D-C86A8F132458}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MiniProject6.Domain", "MiniProject5.Domain\MiniProject6.Domain.csproj", "{27E5BB3F-B25C-4EFE-AA0D-C86A8F132458}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MiniProject5.Application", "MiniProject5.Application\MiniProject5.Application.csproj", "{0521C00B-417E-4E47-A05A-10AD342304C5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MiniProject6.Application", "MiniProject5.Application\MiniProject6.Application.csproj", "{0521C00B-417E-4E47-A05A-10AD342304C5}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{3C7AE66D-2F37-4E64-B7C7-6DFF43527CE1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MiniProject5.Persistence", "MiniProject5.Persistence\MiniProject5.Persistence.csproj", "{EE82921F-B1DF-4B4B-86E0-D42206604418}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MiniProject6.Persistence", "MiniProject5.Persistence\MiniProject6.Persistence.csproj", "{EE82921F-B1DF-4B4B-86E0-D42206604418}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentation", "Presentation", "{7A19E405-A456-4ED0-841E-F4DBC8C00483}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MiniProject5.WebAPI", "MiniProject5.WebAPI\MiniProject5.WebAPI.csproj", "{E8033D17-6B5F-4FE5-A926-76D847F4B45F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MiniProject6.WebAPI", "MiniProject5.WebAPI\MiniProject6.WebAPI.csproj", "{E8033D17-6B5F-4FE5-A926-76D847F4B45F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
