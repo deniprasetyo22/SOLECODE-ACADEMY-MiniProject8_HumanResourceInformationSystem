@@ -73,7 +73,6 @@ public partial class Employee
     public virtual Employee? Supervisor { get; set; }
 
     [InverseProperty("Supervisor")]
-    [JsonIgnore]
     public virtual ICollection<Employee> Subordinates { get; set; } = new List<Employee>();
 
     [Column("status")]
