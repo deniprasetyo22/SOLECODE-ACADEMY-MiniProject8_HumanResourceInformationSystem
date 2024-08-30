@@ -16,6 +16,7 @@ namespace MiniProject6.WebAPI.Controllers
             _authService = authService;
         }
 
+        
         [HttpPost("register")]
         public async Task<IActionResult> RegisterAsync([FromBody] RegisterModel model)
         {

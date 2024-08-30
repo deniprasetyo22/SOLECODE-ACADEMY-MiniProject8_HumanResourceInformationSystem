@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MiniProject6.Persistence.Migrations
 {
     [DbContext(typeof(HrisContext))]
-    [Migration("20240828081718_AddIdentity")]
+    [Migration("20240829103931_AddIdentity")]
     partial class AddIdentity
     {
         /// <inheritdoc />

@@ -26,4 +26,15 @@ public partial class HrisContext : IdentityDbContext<AppUser>
     public virtual DbSet<Project> Projects { get; set; }
 
     public virtual DbSet<Workson> Worksons { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<Employee>()
+            .HasOne(e => e.AppUser)
+            .WithOne(u => u.Employee)
+            .HasForeignKey<Employee>(e => e.userId)
+            .OnDelete(DeleteBehavior.Cascade);
+    }
 }

@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 using MiniProject5.Application.DTOs;
+using MiniProject6.Domain.Models;
 
 namespace MiniProject5.Persistence.Models;
 
@@ -91,8 +92,7 @@ public partial class Employee
     public virtual ICollection<Department>? Departments { get; set; }
 
     [InverseProperty("Emp")]
-    [JsonIgnore]
-    public virtual ICollection<Dependent>? Dependents { get; set; } = new List<Dependent>();
+    public virtual ICollection<Dependent> Dependents { get; set; } = new List<Dependent>();
 
     [ForeignKey("Deptid")]
     [InverseProperty("Employees")]
@@ -100,8 +100,7 @@ public partial class Employee
     public virtual Department? Dept { get; set; }
 
     [InverseProperty("Emp")]
-    [JsonIgnore]
-    public virtual ICollection<Workson>? Worksons { get; set; } = new List<Workson>();
+    public virtual ICollection<Workson> Worksons { get; set; } = new List<Workson>();
 
     [NotMapped]
     public DateOnlyObject? DobObject { get; set; }
@@ -114,5 +113,12 @@ public partial class Employee
         }
     }
 
+    [Column("userId")]
+    [StringLength(255)]
+    public string? userId { get; set; }
+
+    [ForeignKey("userId")]
+    [InverseProperty("Employee")]
+    public virtual AppUser? AppUser { get; set; }
 
 }

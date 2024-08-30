@@ -1,14 +1,17 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using MiniProject5.Application.DTOs;
 using MiniProject5.Application.Interfaces.IRepositories;
 using MiniProject5.Persistence.Context;
 using MiniProject5.Persistence.Models;
+using MiniProject6.Application.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Numerics;
 using System.Reflection;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -17,12 +20,14 @@ namespace MiniProject5.Persistence.Repositories
     public class EmployeeRepository : IEmployeeRepository
     {
         private readonly HrisContext _context;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public EmployeeRepository(HrisContext context)
+        public EmployeeRepository(HrisContext context, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
+            _httpContextAccessor = httpContextAccessor;     
         }
-
+        
         public async Task<IEnumerable<Employee>> GetAllEmployeesAsync(paginationDto pagination)
         {
             var skipNumber = (pagination.pageNumber - 1) * pagination.pageSize;
@@ -34,8 +39,149 @@ namespace MiniProject5.Persistence.Repositories
 
         public async Task<Employee> GetEmployeeByIdAsync(int empId)
         {
-            return await _context.Employees.FindAsync(empId);
+            var employee = await _context.Employees
+                .Where(e => e.Empid == empId)
+                .Include(e => e.Dependents)
+                .FirstOrDefaultAsync();
+            return employee;
         }
+
+        public async Task<EmployeeDto> GetOwnProfile()
+        {
+            var userId = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                // Log jika userId tidak ditemukan
+                Console.WriteLine("User ID tidak ditemukan di HttpContext.");
+                return null;
+            }
+
+            var employee = await _context.Employees
+                .Include(e => e.Dependents)
+                .FirstOrDefaultAsync(e => e.userId == userId);
+
+            if (employee == null)
+            {
+                // Log jika employee tidak ditemukan
+                Console.WriteLine($"Karyawan dengan User ID {userId} tidak ditemukan.");
+                return null;
+            }
+
+            return new EmployeeDto
+            {
+                Empid = employee.Empid,
+                Fname = employee.Fname,
+                Lname = employee.Lname,
+                Email = employee.Email,
+                Address = employee.Address,
+                Position = employee.Position,
+                Sex = employee.Sex,
+                Dob = employee.Dob,
+                Phoneno = employee.Phoneno,
+                Emptype = employee.Emptype,
+                Level = employee.Level,
+                Deptid = employee.Deptid,
+                SupervisorId = employee.SupervisorId,
+                Status = employee.Status,
+                Reason = employee.Reason,
+                Lastupdateddate = employee.Lastupdateddate,
+                Dependents = employee.Dependents?.Select(d => new DependentDto
+                {
+                    Dependentid = d.Dependentid,
+                    fName = d.fName,
+                    lName = d.lName,
+                    Sex = d.Sex,
+                    Dob = d.Dob,
+                    Relationship = d.Relationship
+                }).ToList() ?? new List<DependentDto>()
+            };
+        }
+
+        public async Task UpdateOwnProfile(int empId, EmployeeDto employeeDto)
+        {
+            // Fetch the existing employee including dependents
+            var existingEmployee = await _context.Employees
+                .Include(e => e.Dependents)
+                .FirstOrDefaultAsync(e => e.Empid == empId);
+
+            if (existingEmployee == null)
+            {
+                throw new KeyNotFoundException($"Employee with ID {empId} not found.");
+            }
+
+            // Update the existing employee's properties
+            existingEmployee.Fname = employeeDto.Fname;
+            existingEmployee.Lname = employeeDto.Lname;
+            existingEmployee.Email = employeeDto.Email;
+            existingEmployee.Address = employeeDto.Address;
+            existingEmployee.Position = employeeDto.Position;
+            existingEmployee.Sex = employeeDto.Sex;
+            existingEmployee.Dob = employeeDto.Dob;
+            existingEmployee.Phoneno = employeeDto.Phoneno;
+            existingEmployee.Emptype = employeeDto.Emptype;
+            existingEmployee.Level = employeeDto.Level;
+            existingEmployee.Deptid = employeeDto.Deptid;
+            existingEmployee.SupervisorId = employeeDto.SupervisorId;
+            existingEmployee.Status = employeeDto.Status;
+            existingEmployee.Reason = employeeDto.Reason;
+            existingEmployee.Lastupdateddate = DateTime.Now;
+
+            // Handle dependents
+            if (employeeDto.Dependents != null)
+            {
+                // Find existing dependents by their ID
+                var existingDependents = existingEmployee.Dependents.ToList();
+
+                // Remove dependents that are not in the updated list
+                var dependentsToRemove = existingDependents
+                    .Where(d => !employeeDto.Dependents.Any(ud => ud.Dependentid == d.Dependentid))
+                    .ToList();
+
+                foreach (var dependent in dependentsToRemove)
+                {
+                    _context.Dependents.Remove(dependent);
+                }
+
+                // Add or update dependents
+                foreach (var updatedDependentDto in employeeDto.Dependents)
+                {
+                    var existingDependent = existingDependents
+                        .FirstOrDefault(d => d.Dependentid == updatedDependentDto.Dependentid);
+
+                    if (existingDependent != null)
+                    {
+                        // Update existing dependent
+                        existingDependent.fName = updatedDependentDto.fName;
+                        existingDependent.lName = updatedDependentDto.lName;
+                        existingDependent.Sex = updatedDependentDto.Sex;
+                        existingDependent.Dob = updatedDependentDto.Dob;
+                        existingDependent.Relationship = updatedDependentDto.Relationship;
+                    }
+                    else
+                    {
+                        // Add new dependent
+                        existingEmployee.Dependents.Add(new Dependent
+                        {
+                            fName = updatedDependentDto.fName,
+                            lName = updatedDependentDto.lName,
+                            Sex = updatedDependentDto.Sex,
+                            Dob = updatedDependentDto.Dob,
+                            Relationship = updatedDependentDto.Relationship
+                        });
+                    }
+                }
+            }
+            else
+            {
+                // Remove all dependents if none are provided
+                _context.Dependents.RemoveRange(existingEmployee.Dependents);
+            }
+
+            // Save changes to the database
+            await _context.SaveChangesAsync();
+        }
+
 
         public async Task<Employee> AddEmployeeAsync(Employee employee)
         {
@@ -254,6 +400,14 @@ namespace MiniProject5.Persistence.Repositories
                 .Take(pagination.pageSize)
                 .ToListAsync();
         }
+
+        public async Task<IEnumerable<Employee>> GetSupervisedEmployeesAsync(int supervisorId)
+        {
+            return await _context.Employees
+                .Where(e => e.SupervisorId == supervisorId)
+                .ToListAsync();
+        }
+
 
 
     }

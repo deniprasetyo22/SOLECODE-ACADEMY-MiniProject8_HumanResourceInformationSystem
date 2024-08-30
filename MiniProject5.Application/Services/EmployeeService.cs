@@ -1,7 +1,9 @@
-﻿using MiniProject5.Application.DTOs;
+﻿using Microsoft.EntityFrameworkCore;
+using MiniProject5.Application.DTOs;
 using MiniProject5.Application.Interfaces.IRepositories;
 using MiniProject5.Application.Interfaces.IServices;
 using MiniProject5.Persistence.Models;
+using MiniProject6.Application.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,6 +34,7 @@ namespace MiniProject5.Application.Services
         public async Task<Employee> AddEmployeeAsync(Employee employee)
         {
             return await _employeeRepository.AddEmployeeAsync(employee);
+            
         }
 
         public async Task UpdateEmployeeAsync(int empId, Employee employee)
@@ -52,6 +55,21 @@ namespace MiniProject5.Application.Services
         public async Task<IEnumerable<Employee>> SearchEmployee(searchDto search, paginationDto pagination)
         {
             return await _employeeRepository.SearchEmployee(search, pagination);
+        }
+
+        public async Task<IEnumerable<Employee>> GetSupervisedEmployeesAsync(int supervisorId)
+        {
+            return await _employeeRepository.GetSupervisedEmployeesAsync(supervisorId);
+        }
+
+        public async Task<EmployeeDto> GetOwnProfile()
+        {
+            return await _employeeRepository.GetOwnProfile();
+        }
+
+        public async Task UpdateOwnProfile(int empId, EmployeeDto employeeDto)
+        {
+            await _employeeRepository.UpdateOwnProfile(empId, employeeDto);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MiniProject5.Application.DTOs;
 using MiniProject5.Application.Interfaces.IServices;
@@ -7,6 +8,7 @@ using MiniProject5.Persistence.Models;
 
 namespace MiniProject5.WebAPI.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class DepartmentController : ControllerBase
@@ -18,6 +20,7 @@ namespace MiniProject5.WebAPI.Controllers
             _departmentService = departmentService;
         }
 
+        [Authorize(Roles = "Administrator, Department Manager")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Department>>> GetAllDepartments([FromQuery] paginationDto pagination)
         {
@@ -25,6 +28,7 @@ namespace MiniProject5.WebAPI.Controllers
             return Ok(departments);
         }
 
+        [Authorize(Roles = "Administrator, Department Manager")]
         [HttpGet("{id}")]
         public async Task<ActionResult<Department>> GetDepartment(int id)
         {
@@ -36,6 +40,7 @@ namespace MiniProject5.WebAPI.Controllers
             return Ok(department);
         }
 
+        [Authorize(Roles = "Administrator")]
         [HttpPost]
         public async Task<ActionResult<Department>> AddDepartment(Department department)
         {
@@ -43,6 +48,7 @@ namespace MiniProject5.WebAPI.Controllers
             return CreatedAtAction(nameof(GetDepartment), new { id = newDepartment.Deptid }, newDepartment);
         }
 
+        [Authorize(Roles = "Administrator, Department Manager")]
         [HttpPut("{deptId}")]
         public async Task<IActionResult> UpdateDepartment(int deptId, [FromBody] Department department)
         {
@@ -55,8 +61,7 @@ namespace MiniProject5.WebAPI.Controllers
             return Ok();
         }
 
-
-
+        [Authorize(Roles = "Administrator")]
         [HttpDelete("{deptId}")]
         public async Task<IActionResult> DeleteDepartment(int deptId)
         {

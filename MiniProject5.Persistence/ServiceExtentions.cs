@@ -35,6 +35,10 @@ namespace MiniProject5.Persistence
             services.AddScoped<IWorksOnRepository, WorksOnRepository>();
             services.AddScoped<IWorksOnService, WorksOnService>();
 
+            services.AddHttpContextAccessor();
+
+            services.AddAuthorization();
+
             services.AddScoped<IAuthService, AuthService>();
 
             services.AddIdentity<AppUser, IdentityRole>(options =>
@@ -44,12 +48,14 @@ namespace MiniProject5.Persistence
                 options.Password.RequireDigit = false;
                 options.Password.RequireNonAlphanumeric = false;
                 options.SignIn.RequireConfirmedEmail = true;
-            }).AddEntityFrameworkStores<HrisContext>();
+            })
+            .AddEntityFrameworkStores<HrisContext>()
+            .AddDefaultTokenProviders();
 
             services.AddAuthentication(options =>
             {
-                options.DefaultAuthenticateScheme =
-                options.DefaultChallengeScheme =
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultForbidScheme =
                 options.DefaultScheme =
                 options.DefaultSignInScheme =
@@ -64,8 +70,9 @@ namespace MiniProject5.Persistence
                     ValidAudience = configuration["JWT:Audience"],
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:SigningKey"])),
-
+                    ValidateLifetime = true
                 };
+
             });
 
             return services;
