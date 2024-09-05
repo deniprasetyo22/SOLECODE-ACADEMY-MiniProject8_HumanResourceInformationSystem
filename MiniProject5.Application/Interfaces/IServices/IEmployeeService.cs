@@ -20,6 +20,6 @@ namespace MiniProject5.Application.Interfaces.IServices
         Task<IEnumerable<Employee>> SearchEmployee(searchDto search, paginationDto pagination);
         Task<IEnumerable<Employee>> GetSupervisedEmployeesAsync(int supervisorId);
         Task<EmployeeDto> GetOwnProfile();
-        Task UpdateOwnProfile(int empId, EmployeeDto employeeDto);
+        Task<bool> UpdateOwnProfile(EmployeeDto employeeDto);
     }
 }

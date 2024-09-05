@@ -15,5 +15,6 @@ namespace MiniProject5.Application.Interfaces.IRepositories
         Task<Workson> AddWorksOnAsync(Workson worksOn);
         Task UpdateWorksOnAsync(int empId, int projId, Workson worksOn);
         Task DeleteWorksOnAsync(int empId, int projId);
+        Task<Workson> GetOwnWorkson();
     }
 }

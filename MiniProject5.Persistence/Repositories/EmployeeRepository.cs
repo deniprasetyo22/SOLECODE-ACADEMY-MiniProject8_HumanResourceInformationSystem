@@ -1,10 +1,13 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MiniProject5.Application.DTOs;
 using MiniProject5.Application.Interfaces.IRepositories;
 using MiniProject5.Persistence.Context;
 using MiniProject5.Persistence.Models;
 using MiniProject6.Application.DTOs;
+using MiniProject6.Domain.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,11 +24,13 @@ namespace MiniProject5.Persistence.Repositories
     {
         private readonly HrisContext _context;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly UserManager<AppUser> _userManager;
 
-        public EmployeeRepository(HrisContext context, IHttpContextAccessor httpContextAccessor)
+        public EmployeeRepository(HrisContext context, IHttpContextAccessor httpContextAccessor, UserManager<AppUser> userManager)
         {
             _context = context;
-            _httpContextAccessor = httpContextAccessor;     
+            _httpContextAccessor = httpContextAccessor;
+            _userManager = userManager;
         }
         
         public async Task<IEnumerable<Employee>> GetAllEmployeesAsync(paginationDto pagination)
@@ -48,7 +53,11 @@ namespace MiniProject5.Persistence.Repositories
 
         public async Task<EmployeeDto> GetOwnProfile()
         {
-            var userId = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var user = _httpContextAccessor.HttpContext?.User.Identity!.Name;
+
+            var currentUser = await _userManager.FindByNameAsync(user!);
+
+            var userId = currentUser?.Id;
 
             if (string.IsNullOrEmpty(userId))
             {
@@ -98,16 +107,30 @@ namespace MiniProject5.Persistence.Repositories
             };
         }
 
-        public async Task UpdateOwnProfile(int empId, EmployeeDto employeeDto)
+        public async Task<bool> UpdateOwnProfile(EmployeeDto employeeDto)
         {
-            // Fetch the existing employee including dependents
+            var user = _httpContextAccessor.HttpContext?.User.Identity!.Name;
+
+            var currentUser = await _userManager.FindByNameAsync(user!);
+
+            var userId = currentUser?.Id;
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                // Log jika userId tidak ditemukan
+                Console.WriteLine("User ID tidak ditemukan di HttpContext.");
+                return false;
+            }
+
             var existingEmployee = await _context.Employees
                 .Include(e => e.Dependents)
-                .FirstOrDefaultAsync(e => e.Empid == empId);
+                .FirstOrDefaultAsync(e => e.userId == userId);
 
             if (existingEmployee == null)
             {
-                throw new KeyNotFoundException($"Employee with ID {empId} not found.");
+                // Log jika employee tidak ditemukan
+                Console.WriteLine($"Karyawan dengan User ID {userId} tidak ditemukan.");
+                return false;
             }
 
             // Update the existing employee's properties
@@ -174,12 +197,19 @@ namespace MiniProject5.Persistence.Repositories
             }
             else
             {
-                // Remove all dependents if none are provided
                 _context.Dependents.RemoveRange(existingEmployee.Dependents);
             }
 
-            // Save changes to the database
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error saat update profile: {ex.Message}");
+                return false;
+            }
         }
 
 

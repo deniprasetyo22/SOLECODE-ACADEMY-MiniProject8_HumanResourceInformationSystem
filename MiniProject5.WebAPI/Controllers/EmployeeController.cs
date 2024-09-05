@@ -116,7 +116,7 @@ namespace MiniProject5.WebAPI.Controllers
             return Ok(employees);
         }
 
-        [Authorize(Roles = "Employee")]
+        [Authorize(Roles = "Administrator, Employee")]
         [HttpGet("profile")]
         public async Task<IActionResult> GetOwnProfile()
         {
@@ -131,14 +131,14 @@ namespace MiniProject5.WebAPI.Controllers
         }
 
 
-        [Authorize(Roles = "Employee")]
-        [HttpPut("update/{empId}")]
-        public async Task<IActionResult> UpdateOwnProfile(int empId, [FromBody] EmployeeDto employeeDto)
+        [Authorize(Roles = "Administrator, Employee")]
+        [HttpPut("update")]
+        public async Task<IActionResult> UpdateOwnProfile([FromBody] EmployeeDto employeeDto)
         {
+            var updateOwnPtofile = await _employeeService.UpdateOwnProfile(employeeDto);
             try
             {
-                await _employeeService.UpdateOwnProfile(empId, employeeDto);
-                return Ok();
+                return Ok(updateOwnPtofile);
             }
             catch (KeyNotFoundException)
             {

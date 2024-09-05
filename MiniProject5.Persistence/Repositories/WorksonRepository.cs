@@ -1,8 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using MiniProject5.Application.DTOs;
 using MiniProject5.Application.Interfaces.IRepositories;
 using MiniProject5.Persistence.Context;
 using MiniProject5.Persistence.Models;
+using MiniProject6.Domain.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,10 +18,14 @@ namespace MiniProject5.Persistence.Repositories
     public class WorksOnRepository : IWorksOnRepository
     {
         private readonly HrisContext _context;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly UserManager<AppUser> _userManager;
 
-        public WorksOnRepository(HrisContext context)
+        public WorksOnRepository(HrisContext context, IHttpContextAccessor httpContextAccessor, UserManager<AppUser> userManager)
         {
             _context = context;
+            _httpContextAccessor = httpContextAccessor;
+            _userManager = userManager;
         }
 
         public async Task<IEnumerable<Workson>> GetAllWorksOnAsync(paginationDto pagination)
@@ -62,6 +70,33 @@ namespace MiniProject5.Persistence.Repositories
                 _context.Worksons.Remove(worksOn);
                 await _context.SaveChangesAsync();
             }
+        }
+
+        public async Task<Workson> GetOwnWorkson()
+        {
+            var user = _httpContextAccessor.HttpContext?.User.Identity!.Name;
+
+            var currentUser = await _userManager.FindByNameAsync(user!);
+
+            var userId = currentUser?.Id;
+
+            if(string.IsNullOrEmpty(userId))
+            {
+                Console.WriteLine("User ID not found in context");
+                return null;
+            }
+
+            var ownWorkson = await _context.Worksons
+                .Include(w => w.Proj)
+                .FirstOrDefaultAsync(e => e.Userid == userId);
+
+            if (ownWorkson == null)
+            {
+                Console.WriteLine("Workson not found");
+                return null;
+            }
+
+            return ownWorkson;
         }
     }
 }

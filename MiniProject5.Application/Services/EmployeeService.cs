@@ -67,9 +67,9 @@ namespace MiniProject5.Application.Services
             return await _employeeRepository.GetOwnProfile();
         }
 
-        public async Task UpdateOwnProfile(int empId, EmployeeDto employeeDto)
+        public async Task<bool> UpdateOwnProfile(EmployeeDto employeeDto)
         {
-            await _employeeRepository.UpdateOwnProfile(empId, employeeDto);
+            return await _employeeRepository.UpdateOwnProfile(employeeDto);
         }
     }
 }

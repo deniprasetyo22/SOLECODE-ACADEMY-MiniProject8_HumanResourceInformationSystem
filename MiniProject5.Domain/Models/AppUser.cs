@@ -16,5 +16,7 @@ namespace MiniProject6.Domain.Models
 
         // Navigation property to Employee
         public virtual Employee? Employee { get; set; }
+
+        public virtual Workson? Worksons { get; set; }
     }
 }

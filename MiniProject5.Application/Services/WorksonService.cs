@@ -43,5 +43,10 @@ namespace MiniProject5.Application.Services
         {
             await _worksOnRepository.DeleteWorksOnAsync(empId, projId);
         }
+
+        public async Task<Workson> GetOwnWorkson()
+        {
+            return await _worksOnRepository.GetOwnWorkson();
+        }
     }
 }

@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 using MiniProject5.Application.DTOs;
+using MiniProject6.Domain.Models;
 
 namespace MiniProject5.Persistence.Models;
 
@@ -20,6 +21,10 @@ public partial class Workson
     [Column("projid")]
     public int Projid { get; set; }
 
+    [ForeignKey("Projid")]
+    [InverseProperty("Worksons")]
+    public virtual Project? Proj { get; set; }
+
     [Column("dateworked")]
     public DateOnly Dateworked { get; set; }
 
@@ -31,13 +36,17 @@ public partial class Workson
     [JsonIgnore]
     public virtual Employee? Emp { get; set; }
 
-    [ForeignKey("Projid")]
-    [InverseProperty("Worksons")]
-    [JsonIgnore]
-    public virtual Project? Proj { get; set; }
-
     [NotMapped]
     public DateOnlyObject? DateworkedObject { get; set; }
+
+    [Column("userid")]
+    [StringLength(255)]
+    public string? Userid { get; set; }
+
+    [ForeignKey("Userid")]
+    [InverseProperty("Worksons")]
+    [JsonIgnore]
+    public virtual AppUser? AppUser { get; set; }
 
     public void ConvertDobObjectToDateOnly()
     {

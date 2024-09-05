@@ -62,5 +62,13 @@ namespace MiniProject5.WebAPI.Controllers
             await _worksOnService.DeleteWorksOnAsync(empId, projId);
             return Ok();
         }
+
+        [Authorize(Roles = "Administrator, Employee")]
+        [HttpGet("ownWorkson")]
+        public async Task<IActionResult> GetOwnWorkson()
+        {
+            var ownWorkson = await _worksOnService.GetOwnWorkson();
+            return Ok(ownWorkson);
+        }
     }
 }
