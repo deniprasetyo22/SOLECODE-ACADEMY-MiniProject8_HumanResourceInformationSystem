@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using MiniProject5.Persistence.Models;
 using MiniProject6.Domain.Models;
+using MiniProject6.Persistence.Models;
 
 namespace MiniProject5.Persistence.Context;
 
@@ -27,14 +28,15 @@ public partial class HrisContext : IdentityDbContext<AppUser>
 
     public virtual DbSet<Workson> Worksons { get; set; }
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        base.OnModelCreating(modelBuilder);
+    public virtual DbSet<Nextsteprule> Nextsteprules { get; set; }
 
-        modelBuilder.Entity<Employee>()
-            .HasOne(e => e.AppUser)
-            .WithOne(u => u.Employee)
-            .HasForeignKey<Employee>(e => e.userId)
-            .OnDelete(DeleteBehavior.Cascade);
-    }
+    public virtual DbSet<Process> Processes { get; set; }
+
+    public virtual DbSet<Workflow> Workflows { get; set; }
+
+    public virtual DbSet<Workflowaction> Workflowactions { get; set; }
+
+    public virtual DbSet<Workflowsequence> Workflowsequences { get; set; }
+
+    public virtual DbSet<Leaverequest> Leaverequests { get; set; }
 }

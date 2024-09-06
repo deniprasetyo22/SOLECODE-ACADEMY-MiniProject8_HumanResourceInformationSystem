@@ -24,8 +24,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MiniProject5.Application\MiniProject6.Application.csproj" />
-    <ProjectReference Include="..\MiniProject5.Domain\MiniProject6.Domain.csproj" />
+    <ProjectReference Include="..\MiniProject5.Application\MiniProject7.Application.csproj" />
+    <ProjectReference Include="..\MiniProject5.Domain\MiniProject7.Domain.csproj" />
   </ItemGroup>
 
 </Project>

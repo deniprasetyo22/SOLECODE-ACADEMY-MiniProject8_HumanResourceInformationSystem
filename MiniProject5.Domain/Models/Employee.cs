@@ -6,6 +6,7 @@ using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 using MiniProject5.Application.DTOs;
 using MiniProject6.Domain.Models;
+using MiniProject6.Persistence.Models;
 
 namespace MiniProject5.Persistence.Models;
 
@@ -120,5 +121,8 @@ public partial class Employee
     [ForeignKey("userId")]
     [InverseProperty("Employee")]
     public virtual AppUser? AppUser { get; set; }
+
+    [InverseProperty("Emp")]
+    public virtual ICollection<Leaverequest> Leaverequests { get; set; } = new List<Leaverequest>();
 
 }

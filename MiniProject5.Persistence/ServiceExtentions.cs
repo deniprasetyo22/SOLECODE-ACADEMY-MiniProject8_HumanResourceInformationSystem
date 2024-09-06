@@ -9,9 +9,11 @@ using MiniProject5.Application.Interfaces.IServices;
 using MiniProject5.Application.Services;
 using MiniProject5.Persistence.Context;
 using MiniProject5.Persistence.Repositories;
+using MiniProject6.Application.Interfaces.IRepositories;
 using MiniProject6.Application.Interfaces.IServices;
 using MiniProject6.Application.Services;
 using MiniProject6.Domain.Models;
+using MiniProject6.Persistence.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,6 +36,8 @@ namespace MiniProject5.Persistence
             services.AddScoped<IProjectService, ProjectService>();
             services.AddScoped<IWorksOnRepository, WorksOnRepository>();
             services.AddScoped<IWorksOnService, WorksOnService>();
+            services.AddScoped<IWorkflowRepository, WorkflowRepository>();
+            services.AddScoped<IWorkflowService, WorkflowService>();
 
             services.AddHttpContextAccessor();
 

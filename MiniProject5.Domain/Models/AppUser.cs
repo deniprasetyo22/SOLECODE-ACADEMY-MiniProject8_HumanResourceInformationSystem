@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using MiniProject5.Persistence.Models;
+using MiniProject6.Persistence.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -18,5 +19,14 @@ namespace MiniProject6.Domain.Models
         public virtual Employee? Employee { get; set; }
 
         public virtual Workson? Worksons { get; set; }
+
+        [InverseProperty("Requester")]
+        public virtual ICollection<Process> Processes { get; set; } = new List<Process>();
+
+        [InverseProperty("Actor")]
+        public virtual ICollection<Workflowaction> Workflowactions { get; set; } = new List<Workflowaction>();
+
+        [InverseProperty("RequiredroleNavigation")]
+        public virtual ICollection<Workflowsequence> Workflowsequences { get; set; } = new List<Workflowsequence>();
     }
 }
