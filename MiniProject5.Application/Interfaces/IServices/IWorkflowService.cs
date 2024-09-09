@@ -10,8 +10,6 @@ namespace MiniProject6.Application.Interfaces.IServices
     public interface IWorkflowService
     {
         Task<Leaverequest> SubmitLeaveRequestAsync(Leaverequest request);
-        Task<Workflowaction> AddActionAsync(Workflowaction workflowAction);
-        Task ApproveOrRejectLeaveRequestBySupervisorAsync(int processId, Process Process);
-        Task ApproveOrRejectLeaveRequestByHRAsync(int processId, Process Process);
+        Task ApproveOrRejectLeaveRequestAsync(int processId, Process Process);
     }
 }

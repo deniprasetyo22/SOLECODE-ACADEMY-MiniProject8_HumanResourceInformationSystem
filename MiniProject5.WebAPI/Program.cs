@@ -1,4 +1,8 @@
+using Microsoft.AspNetCore.Http.Features;
 using MiniProject5.Persistence;
+using MiniProject7.Application.Interfaces.IServices;
+using MiniProject7.Application.Services;
+using MiniProject7.Domain.Models.Email;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +20,20 @@ builder.Services.AddSwaggerGen();
 
 // Panggil ConfigurePersistence
 builder.Services.ConfigurePersistence(builder.Configuration);
+
+//Email Settings
+builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
+builder.Services.AddTransient<IEmailService, EmailService>();
+var emailConfig = builder.Configuration
+        .GetSection("MailSettings")
+        .Get<MailSettings>();
+builder.Services.AddSingleton(emailConfig);
+
+builder.Services.Configure<FormOptions>(o => {
+    o.ValueLengthLimit = int.MaxValue;
+    o.MultipartBodyLengthLimit = int.MaxValue;
+    o.MemoryBufferThreshold = int.MaxValue;
+});
 
 var app = builder.Build();
 

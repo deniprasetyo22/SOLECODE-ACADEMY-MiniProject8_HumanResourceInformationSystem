@@ -23,26 +23,11 @@ namespace MiniProject6.WebAPI.Controllers
             return Ok(result);
         }
 
-        [HttpPost("add-action")]
-        public async Task<ActionResult<Workflowaction>> AddAction(Workflowaction workflowAction)
+        [Authorize(Roles = "HR Manager, Employee Supervisor")]
+        [HttpPut("approveOrReject/{processId}")]
+        public async Task<IActionResult> approveOrRejectLeaveRequestAsync(int processId, [FromBody] Process process)
         {
-            var result = await _workflowService.AddActionAsync(workflowAction);
-            return Ok(result);
-        }
-
-        [Authorize(Roles = "Employee Supervisor")]
-        [HttpPut("approveOrRejectBySupervisor/{processId}")]
-        public async Task<IActionResult> approveOrRejectLeaveRequestBySupervisorAsync(int processId, [FromBody] Process process)
-        {
-            await _workflowService.ApproveOrRejectLeaveRequestBySupervisorAsync(processId, process);
-            return Ok();
-        }
-
-        [Authorize(Roles = "HR Manager")]
-        [HttpPut("approveOrRejectByHR/{processId}")]
-        public async Task<IActionResult> approveOrRejectLeaveRequestByHRAsync(int processId, [FromBody] Process process)
-        {
-            await _workflowService.ApproveOrRejectLeaveRequestByHRAsync(processId, process);
+            await _workflowService.ApproveOrRejectLeaveRequestAsync(processId, process);
             return Ok();
         }
     }

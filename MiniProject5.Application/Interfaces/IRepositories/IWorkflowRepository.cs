@@ -11,8 +11,6 @@ namespace MiniProject6.Application.Interfaces.IRepositories
     public interface IWorkflowRepository
     {
         Task<Leaverequest> SubmitLeaveRequestAsync(Leaverequest request);
-        Task<Workflowaction> AddActionAsync(Workflowaction workflowAction);
-        Task ApproveOrRejectLeaveRequestBySupervisorAsync(int processId, Process Process);
-        Task ApproveOrRejectLeaveRequestByHRAsync(int processId, Process Process);
+        Task ApproveOrRejectLeaveRequestAsync(int processId, Process Process);
     }
 }

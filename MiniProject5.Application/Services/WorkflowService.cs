@@ -23,19 +23,9 @@ namespace MiniProject6.Application.Services
             return await _workflowRepository.SubmitLeaveRequestAsync(request);
         }
 
-        public async Task<Workflowaction> AddActionAsync(Workflowaction workflowAction)
+        public async Task ApproveOrRejectLeaveRequestAsync(int processId, Process Process)
         {
-            return await _workflowRepository.AddActionAsync(workflowAction);
-        }
-
-        public async Task ApproveOrRejectLeaveRequestBySupervisorAsync(int processId, Process Process)
-        {
-            await _workflowRepository.ApproveOrRejectLeaveRequestBySupervisorAsync(processId, Process);
-        }
-
-        public async Task ApproveOrRejectLeaveRequestByHRAsync(int processId, Process Process)
-        {
-            await _workflowRepository.ApproveOrRejectLeaveRequestByHRAsync(processId, Process);
+            await _workflowRepository.ApproveOrRejectLeaveRequestAsync(processId, Process);
         }
     }
 }
