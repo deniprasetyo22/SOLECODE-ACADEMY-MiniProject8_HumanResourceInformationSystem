@@ -116,7 +116,7 @@ namespace MiniProject6.Persistence.Repositories
 
             var userEmail = currentUser?.Email;
 
-            var existingProcess = await _context.Processes.FirstOrDefaultAsync(cek => cek.Processid == processId);
+            var existingProcess = await _context.Processes.Include(p => p.Requester).FirstOrDefaultAsync(cek => cek.Processid == processId);
 
             if (userRoles.Contains("Employee Supervisor"))
             {
@@ -142,17 +142,17 @@ namespace MiniProject6.Persistence.Repositories
 
                         var emailBody = System.IO.File.ReadAllText(@"./Templates/EmailTemplates/ApproveOrRejectLeaveRequest.html");
                         emailBody = string.Format(emailBody,
-                            "Leave Request",    //{0}
-                            userName,           //{1}
-                            "Approved",         //{2}
-                            userName           //{3}
+                            "Leave Request",                    //{0}
+                            existingProcess.Requester.UserName,    //{1}
+                            "Approved",                         //{2}
+                            userName                            //{3}
                         );
 
                         var mailData = new MailData
                         {
-                            EmailToIds = new List<string> { userEmail },
+                            EmailToIds = new List<string> { existingProcess.Requester.Email },
                             EmailCCIds = new List<string> { "deni.prasetyo@solecode.id" },
-                            EmailToName = userName,
+                            EmailToName = existingProcess.Requester.UserName,
                             EmailSubject = "Welcome to Our Service!",
                             EmailBody = emailBody
                         };
@@ -180,16 +180,16 @@ namespace MiniProject6.Persistence.Repositories
                         var emailBody = System.IO.File.ReadAllText(@"./Templates/EmailTemplates/ApproveOrRejectLeaveRequest.html");
                         emailBody = string.Format(emailBody,
                             "Leave Request",    //{0}
-                            userName,           //{1}
+                            existingProcess.Requester.UserName,           //{1}
                             "Rejected",         //{2}
                             userName           //{3}
                         );
 
                         var mailData = new MailData
                         {
-                            EmailToIds = new List<string> { userEmail },
+                            EmailToIds = new List<string> { existingProcess.Requester.Email },
                             EmailCCIds = new List<string> { "deni.prasetyo@solecode.id" },
-                            EmailToName = userName,
+                            EmailToName = existingProcess.Requester.UserName,
                             EmailSubject = "Welcome to Our Service!",
                             EmailBody = emailBody
                         };
@@ -226,16 +226,16 @@ namespace MiniProject6.Persistence.Repositories
                         var emailBody = System.IO.File.ReadAllText(@"./Templates/EmailTemplates/ApproveOrRejectLeaveRequest.html");
                         emailBody = string.Format(emailBody,
                             "Leave Request",    //{0}
-                            userName,           //{1}
+                            existingProcess.Requester.UserName,           //{1}
                             "Approved",         //{2}
                             userName           //{3}
                         );
 
                         var mailData = new MailData
                         {
-                            EmailToIds = new List<string> { userEmail },
+                            EmailToIds = new List<string> { existingProcess.Requester.Email },
                             EmailCCIds = new List<string> { "deni.prasetyo@solecode.id" },
-                            EmailToName = userName,
+                            EmailToName = existingProcess.Requester.UserName,
                             EmailSubject = "Welcome to Our Service!",
                             EmailBody = emailBody
                         };
@@ -263,16 +263,16 @@ namespace MiniProject6.Persistence.Repositories
                         var emailBody = System.IO.File.ReadAllText(@"./Templates/EmailTemplates/ApproveOrRejectLeaveRequest.html");
                         emailBody = string.Format(emailBody,
                             "Leave Request",    //{0}
-                            userName,           //{1}
+                            existingProcess.Requester.UserName,           //{1}
                             "Rejected",         //{2}
                             userName           //{3}
                         );
 
                         var mailData = new MailData
                         {
-                            EmailToIds = new List<string> { userEmail },
+                            EmailToIds = new List<string> { existingProcess.Requester.Email },
                             EmailCCIds = new List<string> { "deni.prasetyo@solecode.id" },
-                            EmailToName = userName,
+                            EmailToName = existingProcess.Requester.UserName,
                             EmailSubject = "Welcome to Our Service!",
                             EmailBody = emailBody
                         };
