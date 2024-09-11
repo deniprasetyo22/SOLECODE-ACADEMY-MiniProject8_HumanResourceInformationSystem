@@ -1,6 +1,7 @@
 ﻿using MiniProject5.Application.DTOs;
 using MiniProject5.Persistence.Models;
 using MiniProject6.Application.DTOs;
+using MiniProject8.Application.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,5 +22,7 @@ namespace MiniProject5.Application.Interfaces.IServices
         Task<IEnumerable<Employee>> GetSupervisedEmployeesAsync(int supervisorId);
         Task<EmployeeDto> GetOwnProfile();
         Task<bool> UpdateOwnProfile(EmployeeDto employeeDto);
+        Task<IList<EmployeeListDto>> GetEmployeesByDepartmentAsync(int? departmentId, int pageNumber, int pageSize);
+        Task<int> GetTotalCountByDepartmentAsync(int? departmentId);
     }
 }

@@ -8,7 +8,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace MiniProject6.Persistence.Migrations
+namespace MiniProject8.Persistence.Migrations
 {
     [DbContext(typeof(HrisContext))]
     partial class HrisContextModelSnapshot : ModelSnapshot
@@ -414,9 +414,17 @@ namespace MiniProject6.Persistence.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("hoursworked");
 
+                    b.Property<string>("Userid")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("userid");
+
                     b.HasKey("Empid", "Projid");
 
                     b.HasIndex("Projid");
+
+                    b.HasIndex("Userid")
+                        .IsUnique();
 
                     b.ToTable("workson");
                 });
@@ -489,6 +497,249 @@ namespace MiniProject6.Persistence.Migrations
                         .HasDatabaseName("UserNameIndex");
 
                     b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("MiniProject6.Persistence.Models.Leaverequest", b =>
+                {
+                    b.Property<int>("Requestid")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("requestid");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Requestid"));
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text")
+                        .HasColumnName("description");
+
+                    b.Property<int?>("Empid")
+                        .HasColumnType("integer")
+                        .HasColumnName("empid");
+
+                    b.Property<DateTime?>("Enddate")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("enddate");
+
+                    b.Property<string>("Leavetype")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("leavetype");
+
+                    b.Property<int?>("Processid")
+                        .HasColumnType("integer")
+                        .HasColumnName("processid");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("reason");
+
+                    b.Property<string>("Requestname")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("requestname");
+
+                    b.Property<DateTime?>("Startdate")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("startdate");
+
+                    b.HasKey("Requestid");
+
+                    b.HasIndex("Empid");
+
+                    b.HasIndex("Processid");
+
+                    b.ToTable("leaverequest");
+                });
+
+            modelBuilder.Entity("MiniProject6.Persistence.Models.Nextsteprule", b =>
+                {
+                    b.Property<int>("Ruleid")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("ruleid");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Ruleid"));
+
+                    b.Property<string>("Conditiontype")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("conditiontype");
+
+                    b.Property<string>("Conditionvalue")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("conditionvalue");
+
+                    b.Property<int?>("Currentstepid")
+                        .HasColumnType("integer")
+                        .HasColumnName("currentstepid");
+
+                    b.Property<int?>("Nextstepid")
+                        .HasColumnType("integer")
+                        .HasColumnName("nextstepid");
+
+                    b.HasKey("Ruleid");
+
+                    b.HasIndex("Currentstepid");
+
+                    b.HasIndex("Nextstepid");
+
+                    b.ToTable("nextsteprules");
+                });
+
+            modelBuilder.Entity("MiniProject6.Persistence.Models.Process", b =>
+                {
+                    b.Property<int>("Processid")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("processid");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Processid"));
+
+                    b.Property<int?>("Currentstepid")
+                        .HasColumnType("integer")
+                        .HasColumnName("currentstepid");
+
+                    b.Property<DateTime?>("Requestdate")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("requestdate");
+
+                    b.Property<string>("Requesterid")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("requesterid");
+
+                    b.Property<string>("Requesttype")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("requesttype");
+
+                    b.Property<string>("Status")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("status");
+
+                    b.Property<int?>("Workflowid")
+                        .HasColumnType("integer")
+                        .HasColumnName("workflowid");
+
+                    b.HasKey("Processid");
+
+                    b.HasIndex("Currentstepid");
+
+                    b.HasIndex("Requesterid");
+
+                    b.HasIndex("Workflowid");
+
+                    b.ToTable("process");
+                });
+
+            modelBuilder.Entity("MiniProject6.Persistence.Models.Workflow", b =>
+                {
+                    b.Property<int>("Workflowid")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("workflowid");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Workflowid"));
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text")
+                        .HasColumnName("description");
+
+                    b.Property<string>("Workflowname")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("workflowname");
+
+                    b.HasKey("Workflowid");
+
+                    b.ToTable("workflow");
+                });
+
+            modelBuilder.Entity("MiniProject6.Persistence.Models.Workflowaction", b =>
+                {
+                    b.Property<int>("Actionid")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("actionid");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Actionid"));
+
+                    b.Property<string>("Action")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("action");
+
+                    b.Property<DateTime?>("Actiondate")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("actiondate");
+
+                    b.Property<string>("Actorid")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("actorid");
+
+                    b.Property<string>("Comments")
+                        .HasColumnType("text")
+                        .HasColumnName("comments");
+
+                    b.Property<int?>("Processid")
+                        .HasColumnType("integer")
+                        .HasColumnName("processid");
+
+                    b.Property<int?>("Stepid")
+                        .HasColumnType("integer")
+                        .HasColumnName("stepid");
+
+                    b.HasKey("Actionid");
+
+                    b.HasIndex("Actorid");
+
+                    b.HasIndex("Processid");
+
+                    b.HasIndex("Stepid");
+
+                    b.ToTable("workflowactions");
+                });
+
+            modelBuilder.Entity("MiniProject6.Persistence.Models.Workflowsequence", b =>
+                {
+                    b.Property<int>("Stepid")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("stepid");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Stepid"));
+
+                    b.Property<string>("Requiredrole")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("requiredrole");
+
+                    b.Property<string>("Stepname")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("stepname");
+
+                    b.Property<int?>("Steporder")
+                        .HasColumnType("integer")
+                        .HasColumnName("steporder");
+
+                    b.Property<int?>("Workflowid")
+                        .HasColumnType("integer")
+                        .HasColumnName("workflowid");
+
+                    b.HasKey("Stepid");
+
+                    b.HasIndex("Requiredrole");
+
+                    b.HasIndex("Workflowid");
+
+                    b.ToTable("workflowsequences");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -572,8 +823,7 @@ namespace MiniProject6.Persistence.Migrations
 
                     b.HasOne("MiniProject6.Domain.Models.AppUser", "AppUser")
                         .WithOne("Employee")
-                        .HasForeignKey("MiniProject5.Persistence.Models.Employee", "userId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("MiniProject5.Persistence.Models.Employee", "userId");
 
                     b.Navigation("AppUser");
 
@@ -616,9 +866,102 @@ namespace MiniProject6.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("MiniProject6.Domain.Models.AppUser", "AppUser")
+                        .WithOne("Worksons")
+                        .HasForeignKey("MiniProject5.Persistence.Models.Workson", "Userid");
+
+                    b.Navigation("AppUser");
+
                     b.Navigation("Emp");
 
                     b.Navigation("Proj");
+                });
+
+            modelBuilder.Entity("MiniProject6.Persistence.Models.Leaverequest", b =>
+                {
+                    b.HasOne("MiniProject5.Persistence.Models.Employee", "Emp")
+                        .WithMany("Leaverequests")
+                        .HasForeignKey("Empid");
+
+                    b.HasOne("MiniProject6.Persistence.Models.Process", "Process")
+                        .WithMany("Leaverequests")
+                        .HasForeignKey("Processid");
+
+                    b.Navigation("Emp");
+
+                    b.Navigation("Process");
+                });
+
+            modelBuilder.Entity("MiniProject6.Persistence.Models.Nextsteprule", b =>
+                {
+                    b.HasOne("MiniProject6.Persistence.Models.Workflowsequence", "Currentstep")
+                        .WithMany("NextstepruleCurrentsteps")
+                        .HasForeignKey("Currentstepid");
+
+                    b.HasOne("MiniProject6.Persistence.Models.Workflowsequence", "Nextstep")
+                        .WithMany("NextstepruleNextsteps")
+                        .HasForeignKey("Nextstepid");
+
+                    b.Navigation("Currentstep");
+
+                    b.Navigation("Nextstep");
+                });
+
+            modelBuilder.Entity("MiniProject6.Persistence.Models.Process", b =>
+                {
+                    b.HasOne("MiniProject6.Persistence.Models.Workflowsequence", "Currentstep")
+                        .WithMany("Processes")
+                        .HasForeignKey("Currentstepid");
+
+                    b.HasOne("MiniProject6.Domain.Models.AppUser", "Requester")
+                        .WithMany("Processes")
+                        .HasForeignKey("Requesterid");
+
+                    b.HasOne("MiniProject6.Persistence.Models.Workflow", "Workflow")
+                        .WithMany("Processes")
+                        .HasForeignKey("Workflowid");
+
+                    b.Navigation("Currentstep");
+
+                    b.Navigation("Requester");
+
+                    b.Navigation("Workflow");
+                });
+
+            modelBuilder.Entity("MiniProject6.Persistence.Models.Workflowaction", b =>
+                {
+                    b.HasOne("MiniProject6.Domain.Models.AppUser", "Actor")
+                        .WithMany("Workflowactions")
+                        .HasForeignKey("Actorid");
+
+                    b.HasOne("MiniProject6.Persistence.Models.Process", "Process")
+                        .WithMany("Workflowactions")
+                        .HasForeignKey("Processid");
+
+                    b.HasOne("MiniProject6.Persistence.Models.Workflowsequence", "Step")
+                        .WithMany("Workflowactions")
+                        .HasForeignKey("Stepid");
+
+                    b.Navigation("Actor");
+
+                    b.Navigation("Process");
+
+                    b.Navigation("Step");
+                });
+
+            modelBuilder.Entity("MiniProject6.Persistence.Models.Workflowsequence", b =>
+                {
+                    b.HasOne("MiniProject6.Domain.Models.AppUser", "RequiredroleNavigation")
+                        .WithMany("Workflowsequences")
+                        .HasForeignKey("Requiredrole");
+
+                    b.HasOne("MiniProject6.Persistence.Models.Workflow", "Workflow")
+                        .WithMany("Workflowsequences")
+                        .HasForeignKey("Workflowid");
+
+                    b.Navigation("RequiredroleNavigation");
+
+                    b.Navigation("Workflow");
                 });
 
             modelBuilder.Entity("MiniProject5.Persistence.Models.Department", b =>
@@ -636,6 +979,8 @@ namespace MiniProject6.Persistence.Migrations
 
                     b.Navigation("Dependents");
 
+                    b.Navigation("Leaverequests");
+
                     b.Navigation("Subordinates");
 
                     b.Navigation("Worksons");
@@ -649,6 +994,39 @@ namespace MiniProject6.Persistence.Migrations
             modelBuilder.Entity("MiniProject6.Domain.Models.AppUser", b =>
                 {
                     b.Navigation("Employee");
+
+                    b.Navigation("Processes");
+
+                    b.Navigation("Workflowactions");
+
+                    b.Navigation("Workflowsequences");
+
+                    b.Navigation("Worksons");
+                });
+
+            modelBuilder.Entity("MiniProject6.Persistence.Models.Process", b =>
+                {
+                    b.Navigation("Leaverequests");
+
+                    b.Navigation("Workflowactions");
+                });
+
+            modelBuilder.Entity("MiniProject6.Persistence.Models.Workflow", b =>
+                {
+                    b.Navigation("Processes");
+
+                    b.Navigation("Workflowsequences");
+                });
+
+            modelBuilder.Entity("MiniProject6.Persistence.Models.Workflowsequence", b =>
+                {
+                    b.Navigation("NextstepruleCurrentsteps");
+
+                    b.Navigation("NextstepruleNextsteps");
+
+                    b.Navigation("Processes");
+
+                    b.Navigation("Workflowactions");
                 });
 #pragma warning restore 612, 618
         }

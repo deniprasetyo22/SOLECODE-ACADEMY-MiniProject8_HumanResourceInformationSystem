@@ -29,4 +29,8 @@
     <ProjectReference Include="..\MiniProject5.Domain\MiniProject8.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Migrations\" />
+  </ItemGroup>
+
 </Project>

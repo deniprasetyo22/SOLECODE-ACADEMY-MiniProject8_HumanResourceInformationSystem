@@ -8,6 +8,7 @@ using MiniProject5.Persistence.Context;
 using MiniProject5.Persistence.Models;
 using MiniProject6.Application.DTOs;
 using MiniProject6.Domain.Models;
+using MiniProject8.Application.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -438,6 +439,61 @@ namespace MiniProject5.Persistence.Repositories
                 .ToListAsync();
         }
 
+        public async Task<IList<EmployeeDistributionByDeptDto>> GetEmployeePercentageByDepartmentAsync()
+        {
+            var totalEmployees = await _context.Employees.CountAsync();
+            return await _context.Employees
+                .GroupBy(e => e.Deptid)
+                .Select(g => new EmployeeDistributionByDeptDto
+                {
+                    DeptName = _context.Departments
+                                .Where(d => d.Deptid == g.Key)
+                                .Select(d => d.Deptname)
+                                .FirstOrDefault() ?? "Unknown", // Default to "Unknown" if department is not found
+                    EmployeeCount = g.Count(),
+                    Percentage = (double)g.Count() / totalEmployees * 100
+                })
+                .ToListAsync();
+        }
+
+        public async Task<IList<EmployeeListDto>> GetEmployeesByDepartmentAsync(int? departmentId, int pageNumber, int pageSize)
+        {
+            var query = _context.Employees.AsQueryable();
+
+            if (departmentId.HasValue)
+            {
+                query = query.Where(e => e.Deptid == departmentId.Value);
+            }
+
+            var employees = await query
+                .OrderBy(e => e.Empid) // Optional: Sort by a field
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .Select(e => new EmployeeListDto
+                {
+                    Empid = e.Empid,
+                    Fname = e.Fname,
+                    Lname = e.Lname,
+                    Email = e.Email,
+                    Position = e.Position,
+                    Salary = e.Salary
+                })
+                .ToListAsync();
+
+            return employees;
+        }
+
+        public async Task<int> GetTotalCountByDepartmentAsync(int? departmentId)
+        {
+            var query = _context.Employees.AsQueryable();
+
+            if (departmentId.HasValue)
+            {
+                query = query.Where(e => e.Deptid == departmentId.Value);
+            }
+
+            return await query.CountAsync();
+        }
 
 
     }

@@ -14,6 +14,8 @@ using MiniProject6.Application.Interfaces.IServices;
 using MiniProject6.Application.Services;
 using MiniProject6.Domain.Models;
 using MiniProject6.Persistence.Repositories;
+using MiniProject8.Application.Interfaces.IServices;
+using MiniProject8.Application.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,6 +40,7 @@ namespace MiniProject5.Persistence
             services.AddScoped<IWorksOnService, WorksOnService>();
             services.AddScoped<IWorkflowRepository, WorkflowRepository>();
             services.AddScoped<IWorkflowService, WorkflowService>();
+            services.AddScoped<IDashboardService, DashboardService>();
 
             services.AddHttpContextAccessor();
 

@@ -4,11 +4,16 @@ using MiniProject5.Application.Interfaces.IRepositories;
 using MiniProject5.Application.Interfaces.IServices;
 using MiniProject5.Persistence.Models;
 using MiniProject6.Application.DTOs;
+using MiniProject8.Application.DTOs;
+using PdfSharpCore.Pdf;
+using PdfSharpCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TheArtOfDev.HtmlRenderer.Core;
+using TheArtOfDev.HtmlRenderer.PdfSharp;
 
 namespace MiniProject5.Application.Services
 {
@@ -71,5 +76,16 @@ namespace MiniProject5.Application.Services
         {
             return await _employeeRepository.UpdateOwnProfile(employeeDto);
         }
+
+        public async Task<IList<EmployeeListDto>> GetEmployeesByDepartmentAsync(int? departmentId, int pageNumber, int pageSize)
+        {
+            return await _employeeRepository.GetEmployeesByDepartmentAsync(departmentId, pageNumber, pageSize);
+        }
+
+        public async Task<int> GetTotalCountByDepartmentAsync(int? departmentId)
+        {
+            return await _employeeRepository.GetTotalCountByDepartmentAsync(departmentId);
+        }
+
     }
 }
