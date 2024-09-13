@@ -292,7 +292,7 @@ namespace MiniProject6.Persistence.Repositories
 
         }
 
-        //Workflow Process
+        //Workflow Process 
         public async Task<List<ProcessDto>> GetAllProcessesAsync()
         {
             var userRoles = _httpContextAccessor.HttpContext?.User.Claims
