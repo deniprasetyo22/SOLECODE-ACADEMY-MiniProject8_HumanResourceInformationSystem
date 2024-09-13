@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MiniProject5.Application.Interfaces.IRepositories;
 using MiniProject8.Application.Interfaces.IServices;
+using PdfSharpCore;
 
 namespace MiniProject8.WebAPI.Controllers
 {
@@ -17,6 +19,7 @@ namespace MiniProject8.WebAPI.Controllers
             _employeeService = employeeRepository;
         }
 
+        //Employee Distribution By Department
         [HttpGet("employee-distribution-by-department")]
         public async Task<IActionResult> GetEmployeePercentageByDepartment()
         {
@@ -24,6 +27,15 @@ namespace MiniProject8.WebAPI.Controllers
             return Ok(result);
         }
 
+        //Top 5 employees by performance
+        [HttpGet("top-employees-by-performance")]
+        public async Task<IActionResult> GetTopEmployeesByPerformance()
+        {
+            var topEmployees = await _dashboardService.GetTopEmployeesByPerformanceAsync();
+            return Ok(topEmployees);
+        }
+
+        //Average salary by department
         [HttpGet("average-salary-by-department")]
         public async Task<IActionResult> GetAverageSalaryByDepartment()
         {
@@ -31,34 +43,69 @@ namespace MiniProject8.WebAPI.Controllers
             return Ok(result);
         }
 
-        [HttpGet("employees")]
-        public async Task<IActionResult> GetEmployees([FromQuery] int? departmentId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 20)
+        //Workflow Process
+        [Authorize(Roles = "HR Manager, Employee Supervisor")]
+        [HttpGet("workflow-processes")]
+        public async Task<IActionResult> GetAllProcesses()
         {
-            if (pageNumber < 1 || pageSize < 1)
+            try
             {
-                return BadRequest("Page number and page size must be greater than zero.");
+                var processes = await _dashboardService.GetAllProcessesAsync();
+                return Ok(processes);
             }
-
-            var employees = await _employeeService.GetEmployeesByDepartmentAsync(departmentId, pageNumber, pageSize);
-            var totalCount = await _employeeService.GetTotalCountByDepartmentAsync(departmentId);
-
-            return Ok(new
+            catch (Exception ex)
             {
-                TotalCount = totalCount,
-                Employees = employees
-            });
+                // Tangani kesalahan
+                return StatusCode(500, $"Terjadi kesalahan: {ex.Message}");
+            }
         }
 
-        [HttpGet("employee-report-pdf")]
-        public async Task<IActionResult> GenerateEmployeeReportPdf([FromQuery] int? departmentId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 20)
+        //Employee Leaves
+        [HttpGet("employee-leaves")]
+        public async Task<IActionResult> GetEmployeeLeave(DateTime startDate, DateTime endDate)
+        {
+            try
+            {
+                var employeeLeave = await _dashboardService.GetEmployeeLeavesAsync(startDate, endDate);
+                return Ok(employeeLeave);
+            }
+            catch (Exception ex)
+            {
+                // Tangani kesalahan
+                return StatusCode(500, $"Terjadi kesalahan: {ex.Message}");
+            }
+        }
+
+        //List Employee By Department
+        [HttpGet("list-employee-by-department")]
+        public async Task<IActionResult> GetListEmployeeByDepartment([FromQuery] int pageNumber, [FromQuery] int pageSize, [FromQuery] string departmentName)
         {
             if (pageNumber < 1 || pageSize < 1)
             {
                 return BadRequest("Page number and page size must be greater than zero.");
             }
 
-            var pdfBytes = await _dashboardService.GenerateEmployeeReportPdfAsync(departmentId, pageNumber, pageSize);
-            return File(pdfBytes, "application/pdf", "EmployeeReport.pdf");
+            var listEmployee = await _dashboardService.GetListEmployeeByDepartment(pageNumber, pageSize, departmentName);
+            
+            return Ok(listEmployee);
+        }
+        
+        //Report List Employee By Department
+        [HttpGet("report-list-employee-by-department")]
+        public async Task<IActionResult> GetReportListEmployeeByDepartment([FromQuery] string departmentName)
+        {
+            var listEmployee = await _dashboardService.GetReportListEmployeeByDepartment(departmentName);
+            
+            return File(listEmployee, "application/pdf", "ListEmployeeByDepartment.pdf");
+        }
+
+        //Report Employee Leaves
+        [HttpGet("report-employee-leaves")]
+        public async Task<IActionResult> GetReportEmployeeLeavesAsync(DateTime startDate, DateTime endDate)
+        {
+            var pdfBytes = await _dashboardService.GetReportEmployeeLeavesAsync(startDate, endDate);
+
+            return File(pdfBytes, "application/pdf", "EmployeeLeavesReport.pdf");
         }
     }
 }

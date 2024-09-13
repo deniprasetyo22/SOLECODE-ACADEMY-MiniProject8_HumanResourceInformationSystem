@@ -9,6 +9,8 @@ using MiniProject5.Persistence.Models;
 using MiniProject6.Application.DTOs;
 using MiniProject6.Domain.Models;
 using MiniProject8.Application.DTOs;
+using PdfSharpCore.Pdf;
+using PdfSharpCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +20,7 @@ using System.Reflection;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using TheArtOfDev.HtmlRenderer.PdfSharp;
 
 namespace MiniProject5.Persistence.Repositories
 {
@@ -439,7 +442,8 @@ namespace MiniProject5.Persistence.Repositories
                 .ToListAsync();
         }
 
-        public async Task<IList<EmployeeDistributionByDeptDto>> GetEmployeePercentageByDepartmentAsync()
+        //Employee Distribution By Department
+        public async Task<List<EmployeeDistributionByDeptDto>> GetEmployeePercentageByDepartmentAsync()
         {
             var totalEmployees = await _context.Employees.CountAsync();
             return await _context.Employees
@@ -450,51 +454,113 @@ namespace MiniProject5.Persistence.Repositories
                                 .Where(d => d.Deptid == g.Key)
                                 .Select(d => d.Deptname)
                                 .FirstOrDefault() ?? "Unknown", // Default to "Unknown" if department is not found
-                    EmployeeCount = g.Count(),
-                    Percentage = (double)g.Count() / totalEmployees * 100
+                    EmployeeCount = g.Count()
                 })
                 .ToListAsync();
         }
 
-        public async Task<IList<EmployeeListDto>> GetEmployeesByDepartmentAsync(int? departmentId, int pageNumber, int pageSize)
+        //Average salary by department
+        public async Task<List<AverageSalaryDto>> GetAverageSalaryByDepartmentAsync()
         {
-            var query = _context.Employees.AsQueryable();
+            return await _context.Employees
+                .GroupBy(e => e.Deptid)
+                .Select(g => new AverageSalaryDto
+                {
+                    DeptName = _context.Departments
+                                .Where(d => d.Deptid == g.Key)
+                                .Select(d => d.Deptname)
+                                .FirstOrDefault() ?? "Unknown", // Default to "Unknown" if department is not found
+                    AverageSalary = g.Average(e => e.Salary)
+                })
+                .ToListAsync();
+        }
 
-            if (departmentId.HasValue)
-            {
-                query = query.Where(e => e.Deptid == departmentId.Value);
-            }
+        //List Employee By Department
+        public async Task<List<EmployeeListDto>> GetListEmployeeByDepartment(int pageNumber, int pageSize, string departmentName)
+        {
+            // Query untuk mendapatkan karyawan berdasarkan departemen
+            var query = _context.Employees
+                .Include(e => e.Dept) // Sertakan Dept
+                .Where(e => e.Status == "Active" && e.Dept != null && e.Dept.Deptname.ToLower() == departmentName)
+                .OrderBy(e => e.Dept.Deptname)
+                .ThenBy(e => e.Empid);
 
+            // Pagination dan pemilihan data
             var employees = await query
-                .OrderBy(e => e.Empid) // Optional: Sort by a field
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .Select(e => new EmployeeListDto
                 {
                     Empid = e.Empid,
-                    Fname = e.Fname,
-                    Lname = e.Lname,
+                    Name = e.Fname + " " + e.Lname,
                     Email = e.Email,
                     Position = e.Position,
-                    Salary = e.Salary
+                    Department = e.Dept.Deptname ?? "Unknown" // Default to "Unknown" if department is not found
                 })
                 .ToListAsync();
 
             return employees;
         }
 
-        public async Task<int> GetTotalCountByDepartmentAsync(int? departmentId)
+
+        //Employee Leaves
+        public async Task<List<EmployeeLeaveDto>> GetEmployeeLeavesAsync(DateTime startDate, DateTime endDate)
         {
-            var query = _context.Employees.AsQueryable();
+            var employeeLeaves = await _context.Leaverequests
+                .Include(lr => lr.Process)
+                .Where(lr => lr.Process.Status.Contains("Approved") 
+                    && lr.Process.Requestdate >= startDate
+                    && lr.Process.Requestdate <= endDate)
+                .GroupBy(lr => lr.Leavetype)
+                .Select(group => new EmployeeLeaveDto
+                {
+                    LeavesType = group.Key ?? "Unknown", // Default to "Unknown" if Reason is null
+                    LeavesTotal = group.Count()
+                })
+                .ToListAsync();
 
-            if (departmentId.HasValue)
-            {
-                query = query.Where(e => e.Deptid == departmentId.Value);
-            }
-
-            return await query.CountAsync();
+            return employeeLeaves;
         }
 
+        //Report List Employee By Department
+        public async Task<List<EmployeeListDto>> GetReportListEmployeeByDepartment(string departmentName)
+        {
+            var employees = await _context.Employees
+                .Include(e => e.Dept)
+                .Where(e => e.Status == "Active" && e.Dept != null && e.Dept.Deptname.ToLower() == departmentName.ToLower())
+                .OrderBy(e => e.Dept.Deptname)
+                .ThenBy(e => e.Empid)
+                .Select(e => new EmployeeListDto
+                {
+                    Empid = e.Empid,
+                    Name = e.Fname + " " + e.Lname,
+                    Email = e.Email,
+                    Position = e.Position,
+                    Department = e.Dept.Deptname ?? "Unknown" // Default to "Unknown" if department is not found
+                })
+                .ToListAsync();
+
+            return employees;
+        }
+
+        //Report Employee Leaves
+        public async Task<List<EmployeeLeaveDto>> GetReportEmployeeLeavesAsync(DateTime startDate, DateTime endDate)
+        {
+            var employeeLeaves = await _context.Leaverequests
+                .Include(lr => lr.Process)
+                .Where(lr => lr.Process.Status.Contains("Approved")
+                    && lr.Process.Requestdate >= startDate
+                    && lr.Process.Requestdate <= endDate)
+                .GroupBy(lr => lr.Leavetype)
+                .Select(group => new EmployeeLeaveDto
+                {
+                    LeavesType = group.Key ?? "Unknown", // Default to "Unknown" if Reason is null
+                    LeavesTotal = group.Count()
+                })
+                .ToListAsync();
+
+            return employeeLeaves;
+        }
 
     }
 }

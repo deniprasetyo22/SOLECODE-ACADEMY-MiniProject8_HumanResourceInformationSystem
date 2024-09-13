@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace MiniProject8.Application.DTOs
 {
-    public class EmployeeDistributionByDeptDto
+    public class EmployeeLeaveDto
     {
-        public string DeptName { get; set; } = null!;
-        public int EmployeeCount { get; set; }
+        public int LeavesTotal {get; set;}
+        public string? LeavesType { get; set;}
     }
 }

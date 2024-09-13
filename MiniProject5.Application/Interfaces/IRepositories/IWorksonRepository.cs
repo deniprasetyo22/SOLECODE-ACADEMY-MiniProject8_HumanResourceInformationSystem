@@ -1,5 +1,6 @@
 ﻿using MiniProject5.Application.DTOs;
 using MiniProject5.Persistence.Models;
+using MiniProject8.Application.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,5 +17,8 @@ namespace MiniProject5.Application.Interfaces.IRepositories
         Task UpdateWorksOnAsync(int empId, int projId, Workson worksOn);
         Task DeleteWorksOnAsync(int empId, int projId);
         Task<Workson> GetOwnWorkson();
+
+        //Top 5 employees by performance
+        Task<List<TopEmployeeDto>> GetTopEmployeesByPerformanceAsync();
     }
 }

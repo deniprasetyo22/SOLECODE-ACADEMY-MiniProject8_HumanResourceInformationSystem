@@ -122,19 +122,5 @@ namespace MiniProject5.Persistence.Repositories
             }
         }
 
-        public async Task<IList<AverageSalaryDto>> GetAverageSalaryByDepartmentAsync()
-        {
-            return await _context.Employees
-                .GroupBy(e => e.Deptid)
-                .Select(g => new AverageSalaryDto
-                {
-                    DeptName = _context.Departments
-                                .Where(d => d.Deptid == g.Key)
-                                .Select(d => d.Deptname)
-                                .FirstOrDefault() ?? "Unknown", // Default to "Unknown" if department is not found
-                    AverageSalary = g.Average(e => e.Salary)
-                })
-                .ToListAsync();
-        }
     }
 }

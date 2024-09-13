@@ -77,15 +77,5 @@ namespace MiniProject5.Application.Services
             return await _employeeRepository.UpdateOwnProfile(employeeDto);
         }
 
-        public async Task<IList<EmployeeListDto>> GetEmployeesByDepartmentAsync(int? departmentId, int pageNumber, int pageSize)
-        {
-            return await _employeeRepository.GetEmployeesByDepartmentAsync(departmentId, pageNumber, pageSize);
-        }
-
-        public async Task<int> GetTotalCountByDepartmentAsync(int? departmentId)
-        {
-            return await _employeeRepository.GetTotalCountByDepartmentAsync(departmentId);
-        }
-
     }
 }

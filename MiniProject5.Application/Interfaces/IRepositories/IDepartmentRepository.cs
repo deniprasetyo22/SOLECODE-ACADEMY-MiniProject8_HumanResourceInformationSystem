@@ -16,6 +16,6 @@ namespace MiniProject5.Application.Interfaces.IRepositories
         Task<Department> AddDepartmentAsync(Department department);
         Task UpdateDepartmentAsync(int deptId, Department department);
         Task DeleteDepartmentAsync(int deptId);
-        Task<IList<AverageSalaryDto>> GetAverageSalaryByDepartmentAsync();
+
     }
 }

@@ -22,8 +22,24 @@ namespace MiniProject5.Application.Interfaces.IRepositories
         Task<IEnumerable<Employee>> GetSupervisedEmployeesAsync(int supervisorId);
         Task<EmployeeDto> GetOwnProfile();
         Task<bool> UpdateOwnProfile(EmployeeDto employeeDto);
-        Task<IList<EmployeeDistributionByDeptDto>> GetEmployeePercentageByDepartmentAsync();
-        Task<IList<EmployeeListDto>> GetEmployeesByDepartmentAsync(int? departmentId, int pageNumber, int pageSize);
-        Task<int> GetTotalCountByDepartmentAsync(int? departmentId);
+
+        //Employee Distribution By Department
+        Task<List<EmployeeDistributionByDeptDto>> GetEmployeePercentageByDepartmentAsync();
+
+        //Average salary by department
+        Task<List<AverageSalaryDto>> GetAverageSalaryByDepartmentAsync();
+
+        //List Employee By Department
+        Task<List<EmployeeListDto>> GetListEmployeeByDepartment(int pageNumber, int pageSize, string departmentName);
+
+        //Employee Leaves
+        Task<List<EmployeeLeaveDto>> GetEmployeeLeavesAsync(DateTime startDate, DateTime endDate);
+
+        //Report List Employee By Department
+        Task<List<EmployeeListDto>> GetReportListEmployeeByDepartment(string departmentName);
+
+        //Report Employee Leaves
+        Task<List<EmployeeLeaveDto>> GetReportEmployeeLeavesAsync(DateTime startDate, DateTime endDate);
+
     }
 }

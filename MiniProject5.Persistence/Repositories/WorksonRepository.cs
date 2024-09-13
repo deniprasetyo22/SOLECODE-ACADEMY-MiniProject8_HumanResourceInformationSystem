@@ -7,6 +7,7 @@ using MiniProject5.Application.Interfaces.IRepositories;
 using MiniProject5.Persistence.Context;
 using MiniProject5.Persistence.Models;
 using MiniProject6.Domain.Models;
+using MiniProject8.Application.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -97,6 +98,25 @@ namespace MiniProject5.Persistence.Repositories
             }
 
             return ownWorkson;
+        }
+
+        //Top 5 employees by performance
+        public async Task<List<TopEmployeeDto>> GetTopEmployeesByPerformanceAsync()
+        {
+            return await _context.Worksons
+                .Where(w => w.Hoursworked.HasValue) // Memastikan hoursworked tidak null
+                .GroupBy(w => w.Empid)
+                .Select(g => new TopEmployeeDto
+                {
+                    EmployeeName = _context.Employees
+                        .Where(e => e.Empid == g.Key)
+                        .Select(e => $"{e.Fname} {e.Lname}")
+                        .FirstOrDefault() ?? "Unknown",
+                    TotalHoursWorked = g.Sum(w => w.Hoursworked.Value)
+                })
+                .OrderByDescending(e => e.TotalHoursWorked)
+                .Take(5)
+                .ToListAsync();
         }
     }
 }

@@ -8,6 +8,7 @@ using MiniProject6.Domain.Models;
 using MiniProject6.Persistence.Models;
 using MiniProject7.Application.Interfaces.IServices;
 using MiniProject7.Domain.Models.Email;
+using MiniProject8.Application.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,12 +49,11 @@ namespace MiniProject6.Persistence.Repositories
             {
                 Workflowid = 1,
                 Requestdate = DateTime.Now,
-                Status = "Pending",
+                Status = "Supervisor Review Leave Request",
                 Currentstepid = 2,
                 Requesttype = "Leave Request",
                 Requesterid = userId
             };
-
             await _context.Processes.AddAsync(process);
             await _context.SaveChangesAsync();
 
@@ -122,10 +122,11 @@ namespace MiniProject6.Persistence.Repositories
             {
                 if (existingProcess != null)
                 {
-                    existingProcess.Status = Process.Status;
                     if (Process.Status == "Approve")
                     {
                         existingProcess.Currentstepid = 3;
+
+                        existingProcess.Status = "HR Manager Review Leave Request";
 
                         var workflow = new Workflowaction
                         {
@@ -163,6 +164,8 @@ namespace MiniProject6.Persistence.Repositories
                     if (Process.Status == "Reject")
                     {
                         existingProcess.Currentstepid = 5;
+
+                        existingProcess.Status = "Request Rejected";
 
                         var workflow = new Workflowaction
                         {
@@ -205,10 +208,11 @@ namespace MiniProject6.Persistence.Repositories
             {
                 if (existingProcess != null)
                 {
-                    existingProcess.Status = Process.Status;
                     if (Process.Status == "Approve")
                     {
                         existingProcess.Currentstepid = 5;
+
+                        existingProcess.Status = "Request Approved";
 
                         var workflow = new Workflowaction
                         {
@@ -245,7 +249,9 @@ namespace MiniProject6.Persistence.Repositories
 
                     if (Process.Status == "Reject")
                     {
-                        existingProcess.Currentstepid = 5;
+                        existingProcess.Currentstepid = 4;
+
+                        existingProcess.Status = "Request Rejected";
 
                         var workflow = new Workflowaction
                         {
@@ -284,6 +290,32 @@ namespace MiniProject6.Persistence.Repositories
 
             }
 
+        }
+
+        //Workflow Process
+        public async Task<List<ProcessDto>> GetAllProcessesAsync()
+        {
+            var userRoles = _httpContextAccessor.HttpContext?.User.Claims
+                .Where(c => c.Type == ClaimTypes.Role)
+                .Select(c => c.Value)
+                .ToList();
+
+            var user = _httpContextAccessor.HttpContext?.User.Identity!.Name;
+
+            var processes = await _context.Processes
+                .Include(p => p.Currentstep) // Sertakan Currentstep
+                .Where(p => p.Currentstep != null && userRoles.Contains(p.Currentstep.Requiredrole))
+                .Select(p => new ProcessDto
+                {
+                    Processid = p.Processid,
+                    Workflowid = p.Workflowid,
+                    RequesterUsername = p.Requester.UserName,
+                    Requestdate = p.Requestdate,
+                    Status = p.Status,
+                    CurrentstepName = p.Currentstep.Stepname
+                })
+                .ToListAsync();
+            return processes;
         }
     }
 }
