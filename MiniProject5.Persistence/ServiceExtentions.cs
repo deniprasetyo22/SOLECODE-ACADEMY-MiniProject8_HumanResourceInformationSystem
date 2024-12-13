@@ -4,25 +4,19 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using MiniProject5.Application.Interfaces.IRepositories;
-using MiniProject5.Application.Interfaces.IServices;
-using MiniProject5.Application.Services;
-using MiniProject5.Persistence.Context;
-using MiniProject5.Persistence.Repositories;
-using MiniProject6.Application.Interfaces.IRepositories;
-using MiniProject6.Application.Interfaces.IServices;
-using MiniProject6.Application.Services;
-using MiniProject6.Domain.Models;
-using MiniProject6.Persistence.Repositories;
+using MiniProject8.Application.Interfaces.IRepositories;
 using MiniProject8.Application.Interfaces.IServices;
 using MiniProject8.Application.Services;
+using MiniProject8.Domain.Models;
+using MiniProject8.Persistence.Context;
+using MiniProject8.Persistence.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MiniProject5.Persistence
+namespace MiniProject8.Persistence
 {
     public static class ServiceExtentions
     {
@@ -30,6 +24,7 @@ namespace MiniProject5.Persistence
         {
             var connectionString = configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<HrisContext>(options => options.UseNpgsql(connectionString));
+
             services.AddScoped<IDepartmentRepository, DepartmentRepository>();
             services.AddScoped<IDepartmentService, DepartmentService>();
             services.AddScoped<IEmployeeRepository, EmployeeRepository>();
@@ -38,9 +33,13 @@ namespace MiniProject5.Persistence
             services.AddScoped<IProjectService, ProjectService>();
             services.AddScoped<IWorksOnRepository, WorksOnRepository>();
             services.AddScoped<IWorksOnService, WorksOnService>();
+            services.AddScoped<ILeaveRequestRepository, LeaveRequestRepository>();
+            services.AddScoped<ILeaveRequestService, LeaveRequestService>();
+            services.AddScoped<IProcessRepository, ProcessRepository>();
             services.AddScoped<IWorkflowRepository, WorkflowRepository>();
-            services.AddScoped<IWorkflowService, WorkflowService>();
+            services.AddScoped<IWorkflowActionRepository, WorkflowActionRepository>();
             services.AddScoped<IDashboardService, DashboardService>();
+            services.AddScoped<EmailService>();
 
             services.AddHttpContextAccessor();
 
@@ -63,10 +62,10 @@ namespace MiniProject5.Persistence
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultForbidScheme =
-                options.DefaultScheme =
-                options.DefaultSignInScheme =
-                options.DefaultSignOutScheme = JwtBearerDefaults.AuthenticationScheme;
+                //options.DefaultForbidScheme =
+                //options.DefaultScheme =
+                //options.DefaultSignInScheme =
+                //options.DefaultSignOutScheme = JwtBearerDefaults.AuthenticationScheme;
             }).AddJwtBearer(options =>
             {
                 options.TokenValidationParameters = new TokenValidationParameters
@@ -78,6 +77,24 @@ namespace MiniProject5.Persistence
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:SigningKey"])),
                     ValidateLifetime = true
+                };
+
+                options.Events = new JwtBearerEvents // Handler untuk menyimpan token di cookie
+                {
+                    OnTokenValidated = context =>
+                    {
+                        return Task.CompletedTask;
+                    },
+                    OnAuthenticationFailed = context =>
+                    {
+                        context.Response.StatusCode = 401;
+                        return Task.CompletedTask;
+                    },
+                    OnMessageReceived = context =>
+                    {
+                        context.Token = context.Request.Cookies["AuthToken"];
+                        return Task.CompletedTask;
+                    }
                 };
 
             });

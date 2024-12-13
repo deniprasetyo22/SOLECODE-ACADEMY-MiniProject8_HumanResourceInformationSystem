@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using MiniProject6.Application.DTOs.Account;
-using MiniProject6.Application.Interfaces.IServices;
+using MiniProject8.Application.DTOs.Account;
+using MiniProject8.Application.Interfaces.IServices;
 
-namespace MiniProject6.WebAPI.Controllers
+namespace MiniProject8.WebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -16,7 +16,7 @@ namespace MiniProject6.WebAPI.Controllers
             _authService = authService;
         }
 
-        
+
         [HttpPost("register")]
         public async Task<IActionResult> RegisterAsync([FromBody] RegisterModel model)
         {
@@ -28,7 +28,7 @@ namespace MiniProject6.WebAPI.Controllers
 
             if (result.Status == "Error")
             {
-                return BadRequest(result.Message);
+                return BadRequest(new ResponseModel { Status = "Error", Message = result.Message });
             }
 
             return Ok(result);
@@ -36,21 +36,33 @@ namespace MiniProject6.WebAPI.Controllers
 
         [HttpPost("login")]
         public async Task<IActionResult> LoginAsync([FromBody] LoginModel model)
-
         {
-
             if (!ModelState.IsValid)
-
                 return BadRequest(ModelState);
 
             var result = await _authService.LoginAsync(model);
 
             if (result.Status == "Error")
+            {
+                return Unauthorized(new { status = result.Status, message = result.Message });
+            }
 
-                return BadRequest(result.Message);
-
+            SetRefreshTokenCookie("AuthToken", result.Token, result.TokenExpiresOn);
+            SetRefreshTokenCookie("RefreshToken", result.RefreshToken, result.RefreshTokenExpiration);
             return Ok(result);
+        }
 
+        private void SetRefreshTokenCookie(string tokenType, string? token, DateTime? expires)
+        {
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,  // Hanya dapat diakses oleh server
+                Secure = true,    // Hanya dikirim melalui HTTPS
+                SameSite = SameSiteMode.Strict, // Cegah serangan CSRF
+                Expires = DateTime.Now.AddDays(3) // Waktu kadaluarsa token
+            };
+
+            Response.Cookies.Append(tokenType, token, cookieOptions);
         }
 
         [HttpPost("create-role")]
@@ -68,20 +80,31 @@ namespace MiniProject6.WebAPI.Controllers
         }
 
         [HttpPost("logout")]
-        public async Task<IActionResult> Logout([FromBody] LogoutModel model)
+        public async Task<IActionResult> Logout()
         {
-            if (string.IsNullOrEmpty(model.Username))
+            try
             {
-                return BadRequest(new ResponseModel { Status = "Error", Message = "Username is required!" });
+                // Hapus cookie
+                Response.Cookies.Delete("AuthToken", new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict
+                });
+
+                Response.Cookies.Delete("RefreshToken", new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict
+                });
+
+                return Ok(new { Message = "Logout successfully" });
             }
-
-            var response = await _authService.LogoutAsync(model.Username);
-
-            if (response.Status == "Success")
+            catch (Exception ex)
             {
-                return Ok(response);
+                return StatusCode(500, "An error occurred during logout");
             }
-            return BadRequest(response);
         }
     }
 }

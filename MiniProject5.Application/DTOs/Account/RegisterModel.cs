@@ -1,5 +1,4 @@
-﻿
-using MiniProject5.Persistence.Models;
+﻿using MiniProject8.Domain.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -7,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MiniProject6.Application.DTOs.Account
+namespace MiniProject8.Application.DTOs.Account
 {
     public class RegisterModel
     {

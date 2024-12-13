@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using MiniProject5.Application.Interfaces.IRepositories;
-using MiniProject5.Persistence.Models;
-using MiniProject6.Application.DTOs.Account;
-using MiniProject6.Application.Interfaces.IServices;
-using MiniProject6.Domain.Models;
+using MiniProject8.Application.DTOs.Account;
+using MiniProject8.Application.Interfaces.IRepositories;
+using MiniProject8.Application.Interfaces.IServices;
+using MiniProject8.Domain.Models;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -15,7 +15,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MiniProject6.Application.Services
+namespace MiniProject8.Application.Services
 {
     public class AuthService : IAuthService
     {
@@ -144,47 +144,62 @@ namespace MiniProject6.Application.Services
         //Login user
         public async Task<ResponseModel> LoginAsync(LoginModel model)
         {
-            var user = await _userManager.FindByNameAsync(model.Username);
-            if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
+            var user = await _userManager.Users.Include(u => u.Employee).FirstOrDefaultAsync(u => u.UserName == model.Username);
+
+            //var user = await _userManager.FindByNameAsync(model.Username);
+
+            //var employee = await _employeeRepository.GetEmployeeByUserIdAsync(user.Id);
+
+            // Cek jika user tidak ditemukan
+            if (user == null)
             {
-                var userRoles = await _userManager.GetRolesAsync(user);
-                var authClaims = new List<Claim>()
-                {
-                    new Claim(ClaimTypes.Name, user.UserName),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                };
-
-                foreach (var userRole in userRoles)
-                {
-                    authClaims.Add(new Claim(ClaimTypes.Role, userRole.ToString()));
-                }
-
-                var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:SigningKey"]));
-
-                var token = new JwtSecurityToken(
-                    issuer: _configuration["JWT:Issuer"],
-                    audience: _configuration["JWT:Audience"],
-                    expires: DateTime.Now.AddHours(3),
-                    claims: authClaims,
-                    signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256));
-
-                var refreshToken = GenerateRefreshToken();
-                user.RefreshToken = refreshToken;
-                await _userManager.UpdateAsync(user);
-
-                return new ResponseModel
-                {
-                    Token = new JwtSecurityTokenHandler().WriteToken(token),
-                    ExpiredOn = token.ValidTo,
-                    Message = "User successfully login!",
-                    RefreshToken = refreshToken,
-                    Roles = userRoles.ToList(),
-                    Status = "Success"
-                };
+                return new ResponseModel { Status = "Error", Message = "Username not found !" };
             }
-            return new ResponseModel { Status = "Error", Message = "Password Not valid!" };
 
+            // Cek password
+            if (!await _userManager.CheckPasswordAsync(user, model.Password))
+            {
+                return new ResponseModel { Status = "Error", Message = "Password invalid !" };
+            }
+
+            var userRoles = await _userManager.GetRolesAsync(user);
+            var authClaims = new List<Claim>()
+            {
+                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            };
+
+            foreach (var userRole in userRoles)
+            {
+                authClaims.Add(new Claim(ClaimTypes.Role, userRole.ToString()));
+            }
+
+            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:SigningKey"]));
+
+            var token = new JwtSecurityToken(
+                issuer: _configuration["JWT:Issuer"],
+                audience: _configuration["JWT:Audience"],
+                expires: DateTime.Now.AddDays(3),
+                claims: authClaims,
+                signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256));
+
+            var refreshToken = GenerateRefreshToken();
+            user.RefreshToken = refreshToken;
+            await _userManager.UpdateAsync(user);
+
+            return new ResponseModel
+            {
+                Token = new JwtSecurityTokenHandler().WriteToken(token),
+                TokenExpiresOn = token.ValidTo,
+                Message = "User berhasil login!",
+                User = user,
+                RefreshToken = refreshToken,
+                RefreshTokenExpiration = token.ValidTo,
+                Roles = userRoles.ToList(),
+                Status = "Success"
+            };
         }
+
         // Create Role
         public async Task<ResponseModel> CreateRoleAsync(string rolename)
         {

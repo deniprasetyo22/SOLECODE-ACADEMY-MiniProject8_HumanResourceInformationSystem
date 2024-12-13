@@ -1,13 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using MiniProject5.Application.DTOs;
-using MiniProject5.Application.Interfaces.IServices;
-using MiniProject5.Persistence.Models;
-using MiniProject6.Application.DTOs;
+using MiniProject8.Application.DTOs;
+using MiniProject8.Application.Interfaces.IServices;
+using MiniProject8.Domain.Models;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
 
-namespace MiniProject5.WebAPI.Controllers
+namespace MiniProject8.WebAPI.Controllers
 {
     [Authorize]
     [Route("api/[controller]")]
@@ -21,70 +20,156 @@ namespace MiniProject5.WebAPI.Controllers
             _employeeService = employeeService;
         }
 
-        [Authorize(Roles = "Administrator, HR Manager, Department Manager")]
+        [Authorize(Roles = "Administrator, HR Manager, Department Manager, Employee Supervisor, Employee")]
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Employee>>> GetAllEmployees([FromQuery] paginationDto pagination)
+        public async Task<ActionResult<object>> GetAllEmployees([FromQuery] QueryObjectEmployee query)
         {
-            var employees = await _employeeService.GetAllEmployeesAsync(pagination);
+            try
+            {
+                var employees = await _employeeService.GetAllEmployeesAsync(query);
+                return Ok(employees);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+
+        [Authorize(Roles = "Administrator, HR Manager, Department Manager, Employee Supervisor, Employee")]
+        [HttpGet("NoPages")]
+        public async Task<ActionResult<IEnumerable<Employee>>> GetAllEmployeesNoPages()
+        {
+            var employees = await _employeeService.GetAllEmployeesNoPagesAsync();
             return Ok(employees);
         }
 
-        [Authorize(Roles = "Administrator, HR Manager, Department Manager")]
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Employee>> GetEmployee(int id)
+
+        [Authorize(Roles = "Administrator, HR Manager, Department Manager, Employee Supervisor")]
+        [HttpGet("{empId}")]
+        public async Task<ActionResult<Employee>> GetEmployee(int empId)
         {
-            var employee = await _employeeService.GetEmployeeByIdAsync(id);
-            if (employee == null)
+            try
             {
-                return NotFound();
+                var employee = await _employeeService.GetEmployeeByIdAsync(empId);
+                if (employee == null)
+                {
+                    return NotFound();
+                }
+                return Ok(employee);
             }
-            return Ok(employee);
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
         [Authorize(Roles = "Administrator, HR Manager")]
         [HttpPost]
-        public async Task<ActionResult<Employee>> AddEmployee(Employee employee)
+        public async Task<IActionResult> AddEmployee([FromBody] Employee employee)
         {
-            var newEmployee = await _employeeService.AddEmployeeAsync(employee);
-            return Ok(newEmployee);
+            try
+            {
+                var newEmployee = await _employeeService.AddEmployeeAsync(employee);
+                return Ok("Employee created successfully.");
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
         [Authorize(Roles = "Administrator, HR Manager")]
         [HttpPut("{empId}")]
-        public async Task<IActionResult> UpdateEmployee(int empId, [FromBody] Employee employee)
+        public async Task<IActionResult> UpdateEmployee(int empId, [FromBody] EmployeeDto employeeDto)
         {
-            if (employee == null)
+            try
             {
-                return BadRequest();
+                await _employeeService.UpdateEmployeeAsync(empId, employeeDto);
+                return Ok(new { Message = "Employee Updated Successfully." });
             }
-
-            await _employeeService.UpdateEmployeeAsync(empId, employee);
-            return Ok();
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
         [Authorize(Roles = "Administrator, HR Manager")]
         [HttpPut("deactivate/{empId}")]
         public async Task<IActionResult> DeactivateEmployee(int empId, [FromBody] string reason)
         {
-            await _employeeService.DeactivateEmployeeAsync(empId, reason);
-            return Ok();
+            try
+            {
+                await _employeeService.DeactivateEmployeeAsync(empId, reason);
+                return Ok(new { Message = "Employee deactived successfully." });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        [Authorize(Roles = "Administrator, HR Manager")]
+        [HttpPut("activate/{empId}")]
+        public async Task<IActionResult> ActivateEmployee(int empId)
+        {
+            try
+            {
+                await _employeeService.ActivateEmployeeAsync(empId);
+                return Ok(new { Message = "Employee activate successfully." });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
         [Authorize(Roles = "Administrator, HR Manager")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteEmployee(int id)
         {
-            await _employeeService.DeleteEmployeeAsync(id);
-            return Ok();
+            try
+            {
+                await _employeeService.DeleteEmployeeAsync(id);
+                return Ok(new { Message = "Employee deleted successfully." });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
-        [Authorize(Roles = "Administrator, HR Manager")]
+        [Authorize(Roles = "Administrator, HR Manager, Employee Supervisor")]
         [HttpGet("search")]
-        public async Task<ActionResult<IEnumerable<Employee>>> SearchEmployee([FromQuery] searchDto search, [FromQuery] paginationDto pagination)
+        public async Task<ActionResult<object>> SearchEmployee([FromQuery] searchDto search, [FromQuery] paginationDto pagination)
         {
             if (pagination == null || pagination.pageNumber <= 0 || pagination.pageSize <= 0)
             {
-                return BadRequest("PageNumber and PageSize must greater than zero.");
+                return BadRequest(new { Message = "PageNumber and PageSize must be greater than zero." });
             }
 
             try
@@ -93,7 +178,7 @@ namespace MiniProject5.WebAPI.Controllers
 
                 if (employees == null || !employees.Any())
                 {
-                    return NotFound("No employees found matching the search criteria.");
+                    return NotFound(new { Message = "No employees found matching the search criteria." });
                 }
 
                 return Ok(employees);
@@ -111,7 +196,7 @@ namespace MiniProject5.WebAPI.Controllers
             var employees = await _employeeService.GetSupervisedEmployeesAsync(supervisorId);
             if (employees == null || !employees.Any())
             {
-                return NotFound("No supervised employees found.");
+                return NotFound(new { Message = "No supervised employees found." });
             }
             return Ok(employees);
         }
@@ -124,7 +209,7 @@ namespace MiniProject5.WebAPI.Controllers
 
             if (profile == null)
             {
-                return NotFound("Profil karyawan tidak ditemukan.");
+                return NotFound(new { Message = "Profile Not Found." });
             }
 
             return Ok(profile);
@@ -138,11 +223,11 @@ namespace MiniProject5.WebAPI.Controllers
             var updateOwnPtofile = await _employeeService.UpdateOwnProfile(employeeDto);
             try
             {
-                return Ok(updateOwnPtofile);
+                return Ok(new { Message = "Profile updated successfully." });
             }
             catch (KeyNotFoundException)
             {
-                return NotFound();
+                return NotFound(new { Message = "Profile Not Found." });
             }
         }
     }

@@ -1,15 +1,15 @@
 ﻿using MailKit.Net.Smtp;
 using Microsoft.Extensions.Options;
 using MimeKit;
-using MiniProject7.Application.Interfaces.IServices;
-using MiniProject7.Domain.Models.Email;
+using MiniProject8.Application.Interfaces.IServices;
+using MiniProject8.Domain.Models.Email;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MiniProject7.Application.Services
+namespace MiniProject8.Application.Services
 {
     public class EmailService : IEmailService
     {

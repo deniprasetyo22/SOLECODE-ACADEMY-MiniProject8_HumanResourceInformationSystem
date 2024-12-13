@@ -8,6 +8,7 @@ namespace MiniProject8.Application.DTOs
 {
     public class TopEmployeeDto
     {
+        public int EmpId { get; set; }
         public string? EmployeeName { get; set; }
         public int TotalHoursWorked { get; set; }
     }

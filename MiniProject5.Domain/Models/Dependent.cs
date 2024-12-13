@@ -4,9 +4,8 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
-using MiniProject5.Application.DTOs;
 
-namespace MiniProject5.Persistence.Models;
+namespace MiniProject8.Domain.Models;
 
 [Table("dependent")]
 public partial class Dependent
@@ -39,7 +38,6 @@ public partial class Dependent
 
     [ForeignKey("Empid")]
     [InverseProperty("Dependents")]
-    [JsonIgnore]
     public virtual Employee? Emp { get; set; }
 
     [NotMapped]

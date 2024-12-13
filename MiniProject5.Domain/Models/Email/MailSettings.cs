@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MiniProject7.Domain.Models.Email
+namespace MiniProject8.Domain.Models.Email
 {
     public class MailSettings
     {

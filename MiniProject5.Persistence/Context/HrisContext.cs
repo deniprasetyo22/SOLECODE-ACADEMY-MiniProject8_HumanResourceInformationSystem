@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using MiniProject5.Persistence.Models;
-using MiniProject6.Domain.Models;
-using MiniProject6.Persistence.Models;
+using MiniProject8.Domain.Models;
 
-namespace MiniProject5.Persistence.Context;
+namespace MiniProject8.Persistence.Context;
 
 public partial class HrisContext : IdentityDbContext<AppUser>
 {

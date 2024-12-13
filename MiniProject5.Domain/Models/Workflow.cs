@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
-namespace MiniProject6.Persistence.Models;
+namespace MiniProject8.Domain.Models;
 
 [Table("workflow")]
 public partial class Workflow

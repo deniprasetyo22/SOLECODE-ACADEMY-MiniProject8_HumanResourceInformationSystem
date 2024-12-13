@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 
-namespace MiniProject5.Persistence.Models;
+namespace MiniProject8.Domain.Models;
 
 [Table("project")]
 public partial class Project
@@ -26,6 +26,5 @@ public partial class Project
     public virtual Department? Dept { get; set; }
 
     [InverseProperty("Proj")]
-    [JsonIgnore]
     public virtual ICollection<Workson>? Worksons { get; set; } = new List<Workson>();
 }

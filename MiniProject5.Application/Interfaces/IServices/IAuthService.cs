@@ -1,11 +1,11 @@
-﻿using MiniProject6.Application.DTOs.Account;
+﻿using MiniProject8.Application.DTOs.Account;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MiniProject6.Application.Interfaces.IServices
+namespace MiniProject8.Application.Interfaces.IServices
 {
     public interface IAuthService
     {

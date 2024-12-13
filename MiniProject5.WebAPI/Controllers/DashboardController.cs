@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using MiniProject5.Application.Interfaces.IRepositories;
 using MiniProject8.Application.Interfaces.IServices;
+using MiniProject8.Application.Services;
 using PdfSharpCore;
 
 namespace MiniProject8.WebAPI.Controllers
@@ -12,100 +12,96 @@ namespace MiniProject8.WebAPI.Controllers
     public class DashboardController : ControllerBase
     {
         private readonly IDashboardService _dashboardService;
-        private readonly IEmployeeRepository _employeeService;
-        public DashboardController(IDashboardService dashboardService, IEmployeeRepository employeeRepository)
+        public DashboardController(IDashboardService dashboardService)
         {
             _dashboardService = dashboardService;
-            _employeeService = employeeRepository;
         }
 
-        //Employee Distribution By Department
-        [HttpGet("employee-distribution-by-department")]
-        public async Task<IActionResult> GetEmployeePercentageByDepartment()
-        {
-            var result = await _dashboardService.GetEmployeePercentageByDepartmentAsync();
-            return Ok(result);
-        }
-
-        //Top 5 employees by performance
-        [HttpGet("top-employees-by-performance")]
-        public async Task<IActionResult> GetTopEmployeesByPerformance()
-        {
-            var topEmployees = await _dashboardService.GetTopEmployeesByPerformanceAsync();
-            return Ok(topEmployees);
-        }
-
-        //Average salary by department
-        [HttpGet("average-salary-by-department")]
-        public async Task<IActionResult> GetAverageSalaryByDepartment()
-        {
-            var result = await _dashboardService.GetAverageSalaryByDepartmentAsync();
-            return Ok(result);
-        }
-
-        //Workflow Process
-        [Authorize(Roles = "HR Manager, Employee Supervisor")]
-        [HttpGet("workflow-processes")]
-        public async Task<IActionResult> GetAllProcesses()
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> GetEmployeeDistributionByDepartment()
         {
             try
             {
-                var processes = await _dashboardService.GetAllProcessesAsync();
-                return Ok(processes);
+                var empDistribution = await _dashboardService.GetEmployeeDistributionByDepartmentAsync();
+                var topEmployees = await _dashboardService.GetTopEmployeesByPerformanceAsync();
+                var averageSalary = await _dashboardService.GetAverageSalaryByDepartmentAsync();
+                var processes = await _dashboardService.GetWorkflowProcessesAsync();
+                var employeesTotal = await _dashboardService.GetEmployeesTotalAsync();
+                var departmentsTotal = await _dashboardService.GetDepartmentsTotalAsync();
+                var projectsTotal = await _dashboardService.GetProjectsTotalAsync();
+                var assignmentsTotal = await _dashboardService.GetAssignmentsTotalAsync();
+                return Ok(new
+                {
+                    EmployeeDistribution = empDistribution,
+                    TopEmployees = topEmployees,
+                    AverageSalary = averageSalary,
+                    Processes = processes,
+                    EmployeesTotal = employeesTotal,
+                    DepartmentsTotal = departmentsTotal,
+                    AssignmentsTotal = assignmentsTotal,
+                    ProjectsTotal = projectsTotal,
+                });
             }
             catch (Exception ex)
             {
-                // Tangani kesalahan
-                return StatusCode(500, $"Terjadi kesalahan: {ex.Message}");
+                return BadRequest(ex.Message);
             }
         }
 
-        //Employee Leaves
-        [HttpGet("employee-leaves")]
-        public async Task<IActionResult> GetEmployeeLeave(DateTime startDate, DateTime endDate)
+        [Authorize]
+        [HttpGet("list-employees-by-department-report")]
+        public async Task<IActionResult> GetListEmployeeByDepartmentReportAsync([FromQuery] string departmentName)
+        {
+            if (string.IsNullOrWhiteSpace(departmentName))
+            {
+                return BadRequest(new {message = "Department name is required." });
+            }
+
+            try
+            {
+                var pdfBytes = await _dashboardService.GetListEmployeeByDepartmentReportAsync(departmentName);
+                return File(pdfBytes, "application/pdf", $"{departmentName}_Employee_Report.pdf");
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception (not shown here)
+                return StatusCode(500, "An error occurred while generating the report.");
+            }
+        }
+
+        [Authorize]
+        [HttpGet("employee-leaves-report")]
+        public async Task<IActionResult> GetEmployeeLeavesReportAsync([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
         {
             try
             {
-                var employeeLeave = await _dashboardService.GetEmployeeLeavesAsync(startDate, endDate);
-                return Ok(employeeLeave);
+                var pdfBytes = await _dashboardService.GetEmployeeLeavesReportAsync(startDate, endDate);
+                return File(pdfBytes, "application/pdf", $"Employee_Leaves_Report_{DateTime.Now:yyyyMMdd}.pdf");
             }
             catch (Exception ex)
             {
-                // Tangani kesalahan
-                return StatusCode(500, $"Terjadi kesalahan: {ex.Message}");
+                return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
 
-        //List Employee By Department
-        [HttpGet("list-employee-by-department")]
-        public async Task<IActionResult> GetListEmployeeByDepartment([FromQuery] int pageNumber, [FromQuery] int pageSize, [FromQuery] string departmentName)
+        [Authorize]
+        [HttpGet("projects-report")]
+        public async Task<IActionResult> GetAllProjectsReport()
         {
-            if (pageNumber < 1 || pageSize < 1)
+            try
             {
-                return BadRequest("Page number and page size must be greater than zero.");
+                var reportBytes = await _dashboardService.GetAllProjectsReportAsync();
+                return File(reportBytes, "application/pdf", "ProjectsReport.pdf");
             }
-
-            var listEmployee = await _dashboardService.GetListEmployeeByDepartment(pageNumber, pageSize, departmentName);
-            
-            return Ok(listEmployee);
-        }
-        
-        //Report List Employee By Department
-        [HttpGet("report-list-employee-by-department")]
-        public async Task<IActionResult> GetReportListEmployeeByDepartment([FromQuery] string departmentName)
-        {
-            var listEmployee = await _dashboardService.GetReportListEmployeeByDepartment(departmentName);
-            
-            return File(listEmployee, "application/pdf", "ListEmployeeByDepartment.pdf");
-        }
-
-        //Report Employee Leaves 
-        [HttpGet("report-employee-leaves")]
-        public async Task<IActionResult> GetReportEmployeeLeavesAsync(DateTime startDate, DateTime endDate)
-        {
-            var pdfBytes = await _dashboardService.GetReportEmployeeLeavesAsync(startDate, endDate);
-
-            return File(pdfBytes, "application/pdf", "EmployeeLeavesReport.pdf");
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
     }
 }

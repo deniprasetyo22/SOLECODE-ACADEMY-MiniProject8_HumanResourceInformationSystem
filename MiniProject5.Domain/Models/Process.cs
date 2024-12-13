@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
-using MiniProject6.Domain.Models;
 
-namespace MiniProject6.Persistence.Models;
+namespace MiniProject8.Domain.Models;
 
 [Table("process")]
 public partial class Process
@@ -34,7 +33,7 @@ public partial class Process
     public int? Currentstepid { get; set; }
 
     [Column("requestdate", TypeName = "timestamp without time zone")]
-    public DateTime? Requestdate { get; set; }
+    public DateTime? Requestdate { get; set; } = DateTime.Now;
 
     [ForeignKey("Currentstepid")]
     [InverseProperty("Processes")]

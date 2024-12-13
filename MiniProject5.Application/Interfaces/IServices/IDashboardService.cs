@@ -1,5 +1,4 @@
-﻿using MiniProject5.Application.Interfaces.IRepositories;
-using MiniProject8.Application.DTOs;
+﻿using MiniProject8.Application.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,28 +10,40 @@ namespace MiniProject8.Application.Interfaces.IServices
     public interface IDashboardService
     {
         //Employee Distribution By Department
-        Task<List<EmployeeDistributionByDeptDto>> GetEmployeePercentageByDepartmentAsync();
+        Task<List<EmployeeDistributionByDeptDto>> GetEmployeeDistributionByDepartmentAsync();
+
+        //Top 5 Employees By Performance
+        Task<List<TopEmployeeDto>> GetTopEmployeesByPerformanceAsync();
 
         //Average salary by department
         Task<List<AverageSalaryDto>> GetAverageSalaryByDepartmentAsync();
 
-        //Top Employees By Performance
-        Task<List<TopEmployeeDto>> GetTopEmployeesByPerformanceAsync();
-
         //Workflow Process
-        Task<List<ProcessDto>> GetAllProcessesAsync();
+        Task<object> GetWorkflowProcessesAsync();
 
-        //Employee Leaves
-        Task<List<EmployeeLeaveDto>> GetEmployeeLeavesAsync(DateTime startDate, DateTime endDate);
+        //Employees Total
+        Task<object> GetEmployeesTotalAsync();
+
+        //Departments Total
+        Task<object> GetDepartmentsTotalAsync();
+
+        //Projects Total
+        Task<object> GetProjectsTotalAsync();
+
+        //Assignments Total
+        Task<object> GetAssignmentsTotalAsync();
 
         //List Employee By Department
-        Task<List<EmployeeListDto>> GetListEmployeeByDepartment(int pageNumber, int pageSize, string departmentName);
-        
-        //Report List Employee By Department
-        Task<byte[]> GetReportListEmployeeByDepartment(string departmentName);
+        Task<List<EmployeeListDto>> GetListEmployeeByDepartmentAsync(int pageNumber, int pageSize, string departmentName);
 
-        //Report Employee Leaves
-        Task<byte[]> GetReportEmployeeLeavesAsync(DateTime startDate, DateTime endDate);
+        //List Employee By Department Report
+        Task<byte[]> GetListEmployeeByDepartmentReportAsync(string departmentName);
+
+        //Employee Leaves Report
+        Task<byte[]> GetEmployeeLeavesReportAsync(DateTime startDate, DateTime endDate);
+
+        //Project Report
+        Task<byte[]> GetAllProjectsReportAsync();
 
     }
 }

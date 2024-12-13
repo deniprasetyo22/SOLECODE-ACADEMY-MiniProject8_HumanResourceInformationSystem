@@ -4,10 +4,8 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
-using MiniProject5.Application.DTOs;
-using MiniProject6.Domain.Models;
 
-namespace MiniProject5.Persistence.Models;
+namespace MiniProject8.Domain.Models;
 
 [PrimaryKey("Empid", "Projid")]
 [Table("workson")]
@@ -33,7 +31,6 @@ public partial class Workson
 
     [ForeignKey("Empid")]
     [InverseProperty("Worksons")]
-    [JsonIgnore]
     public virtual Employee? Emp { get; set; }
 
     [NotMapped]
@@ -45,7 +42,6 @@ public partial class Workson
 
     [ForeignKey("Userid")]
     [InverseProperty("Worksons")]
-    [JsonIgnore]
     public virtual AppUser? AppUser { get; set; }
 
     public void ConvertDobObjectToDateOnly()

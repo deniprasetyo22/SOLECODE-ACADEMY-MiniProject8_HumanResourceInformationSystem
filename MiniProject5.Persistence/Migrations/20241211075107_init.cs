@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MiniProject8.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class AddInit : Migration
+    public partial class init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -190,7 +190,7 @@ namespace MiniProject8.Persistence.Migrations
                     table.ForeignKey(
                         name: "FK_workflowsequences_AspNetUsers_requiredrole",
                         column: x => x.requiredrole,
-                        principalTable: "AspNetUsers",
+                        principalTable: "AspNetRoles",
                         principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_workflowsequences_workflow_workflowid",
@@ -425,7 +425,9 @@ namespace MiniProject8.Persistence.Migrations
                     processid = table.Column<int>(type: "integer", nullable: true),
                     empid = table.Column<int>(type: "integer", nullable: true),
                     leavetype = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    reason = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false)
+                    reason = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    file = table.Column<string>(type: "text", nullable: true),
+                    totaldays = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {

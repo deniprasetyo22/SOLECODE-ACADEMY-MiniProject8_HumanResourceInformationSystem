@@ -1,6 +1,4 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using MiniProject5.Persistence.Models;
-using MiniProject6.Persistence.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -8,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MiniProject6.Domain.Models
+namespace MiniProject8.Domain.Models
 {
     public class AppUser:IdentityUser
     {

@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 
-namespace MiniProject5.Persistence.Models;
+namespace MiniProject8.Domain.Models;
 
 [Table("location")]
 public partial class Location
@@ -23,6 +23,5 @@ public partial class Location
 
     [ForeignKey("Deptid")]
     [InverseProperty("Locations")]
-    [JsonIgnore]
     public virtual Department? Dept { get; set; }
 }

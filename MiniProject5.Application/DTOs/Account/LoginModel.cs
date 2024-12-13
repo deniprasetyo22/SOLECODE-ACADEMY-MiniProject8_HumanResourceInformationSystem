@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MiniProject6.Application.DTOs.Account
+namespace MiniProject8.Application.DTOs.Account
 {
     public class LoginModel
     {

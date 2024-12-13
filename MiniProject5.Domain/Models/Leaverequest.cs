@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
-using MiniProject5.Persistence.Models;
 
-namespace MiniProject6.Persistence.Models;
+namespace MiniProject8.Domain.Models;
 
 [Table("leaverequest")]
 public partial class Leaverequest
@@ -49,4 +48,12 @@ public partial class Leaverequest
     [ForeignKey("Processid")]
     [InverseProperty("Leaverequests")]
     public virtual Process? Process { get; set; }
+
+    [Column("file")]
+    public string? File { get; set; }
+    [NotMapped]
+    public string? FileUrl => $"/files/{File}";
+
+    [Column("totaldays")]
+    public int Totaldays { get; set; }
 }

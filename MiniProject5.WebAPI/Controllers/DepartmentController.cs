@@ -1,12 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using MiniProject5.Application.DTOs;
-using MiniProject5.Application.Interfaces.IServices;
-using MiniProject5.Application.Services;
-using MiniProject5.Persistence.Models;
+using MiniProject8.Application.DTOs;
+using MiniProject8.Application.Interfaces.IServices;
+using MiniProject8.Domain.Models;
+using Microsoft.AspNetCore.Http;
 
-namespace MiniProject5.WebAPI.Controllers
+namespace MiniProject8.WebAPI.Controllers
 {
     [Authorize]
     [Route("api/[controller]")]
@@ -20,53 +19,95 @@ namespace MiniProject5.WebAPI.Controllers
             _departmentService = departmentService;
         }
 
-        [Authorize(Roles = "Administrator, Department Manager")]
+        // GET: api/Department
+        [Authorize(Roles = "Administrator, HR Manager, Department Manager, Employee Supervisor, Employee")]
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Department>>> GetAllDepartments([FromQuery] paginationDto pagination)
+        public async Task<ActionResult> GetAllDepartments([FromQuery] QueryObjectDepartment query)
         {
-            var departments = await _departmentService.GetAllDepartmentsAsync(pagination);
+            var result = await _departmentService.GetAllDepartmentsAsync(query);
+            return Ok(result);
+        }
+
+        // GET: api/Department/NoPages
+        [HttpGet("NoPages")]
+        public async Task<ActionResult<IEnumerable<Department>>> GetAllDepartmentsNoPages()
+        {
+            var departments = await _departmentService.GetAllDepartmentsNoPagesAsync();
             return Ok(departments);
         }
 
-        [Authorize(Roles = "Administrator, Department Manager")]
+        // GET: api/Department/{id}
+        [Authorize(Roles = "Administrator, HR Manager, Department Manager, Employee Supervisor, Employee")]
         [HttpGet("{id}")]
         public async Task<ActionResult<Department>> GetDepartment(int id)
         {
-            var department = await _departmentService.GetDepartmentByIdAsync(id);
-            if (department == null)
+            try
             {
-                return NotFound();
+                var department = await _departmentService.GetDepartmentByIdAsync(id);
+                return Ok(department);
             }
-            return Ok(department);
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
         }
 
+        // POST: api/Department
         [Authorize(Roles = "Administrator")]
         [HttpPost]
-        public async Task<ActionResult<Department>> AddDepartment(Department department)
+        public async Task<ActionResult<Department>> AddDepartment([FromBody] Department department)
         {
-            var newDepartment = await _departmentService.AddDepartmentAsync(department);
-            return CreatedAtAction(nameof(GetDepartment), new { id = newDepartment.Deptid }, newDepartment);
+            if (department == null)
+            {
+                return BadRequest(new { message = "Invalid department data." });
+            }
+
+            try
+            {
+                var newDepartment = await _departmentService.AddDepartmentAsync(department);
+                return CreatedAtAction(nameof(GetDepartment), new { id = newDepartment.Deptid }, newDepartment);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
+        // PUT: api/Department/{deptId}
         [Authorize(Roles = "Administrator, Department Manager")]
         [HttpPut("{deptId}")]
         public async Task<IActionResult> UpdateDepartment(int deptId, [FromBody] Department department)
         {
             if (department == null)
             {
-                return BadRequest();
+                return BadRequest(new { message = "Invalid department data." });
             }
 
-            await _departmentService.UpdateDepartmentAsync(deptId, department);
-            return Ok();
+            try
+            {
+                await _departmentService.UpdateDepartmentAsync(deptId, department);
+                return NoContent();
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
         }
 
+        // DELETE: api/Department/{deptId}
         [Authorize(Roles = "Administrator")]
         [HttpDelete("{deptId}")]
         public async Task<IActionResult> DeleteDepartment(int deptId)
         {
-            await _departmentService.DeleteDepartmentAsync(deptId);
-            return Ok();
+            try
+            {
+                await _departmentService.DeleteDepartmentAsync(deptId);
+                return NoContent();
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
         }
     }
 }

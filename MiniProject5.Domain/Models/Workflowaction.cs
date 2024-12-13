@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
-using MiniProject6.Domain.Models;
 
-namespace MiniProject6.Persistence.Models;
+namespace MiniProject8.Domain.Models;
 
 [Table("workflowactions")]
 public partial class Workflowaction

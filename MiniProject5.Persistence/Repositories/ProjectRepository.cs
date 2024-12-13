@@ -1,15 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MiniProject5.Application.DTOs;
-using MiniProject5.Application.Interfaces.IRepositories;
-using MiniProject5.Persistence.Context;
-using MiniProject5.Persistence.Models;
+using MiniProject8.Application.Interfaces.IRepositories;
+using MiniProject8.Domain.Models;
+using MiniProject8.Persistence.Context;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MiniProject5.Persistence.Repositories
+namespace MiniProject8.Persistence.Repositories
 {
     public class ProjectRepository : IProjectRepository
     {
@@ -20,12 +19,11 @@ namespace MiniProject5.Persistence.Repositories
             _context = context;
         }
 
-        public async Task<IEnumerable<Project>> GetAllProjectsAsync(paginationDto pagination)
+        public async Task<IEnumerable<Project>> GetAllProjectsAsync()
         {
-            var skipNumber = (pagination.pageNumber - 1) * pagination.pageSize;
             return await _context.Projects
-                .Skip(skipNumber)
-                .Take(pagination.pageSize)
+                .Include(b=>b.Dept)
+                .Include(b=>b.Worksons).ThenInclude(b=>b.Emp)
                 .ToListAsync();
         }
 
@@ -41,15 +39,10 @@ namespace MiniProject5.Persistence.Repositories
             return project;
         }
 
-        public async Task UpdateProjectAsync(int projId, Project project)
+        public async Task UpdateProjectAsync(Project project)
         {
-            var existingProj = await _context.Projects.FirstOrDefaultAsync(cek => cek.Projid == projId);
-            if (existingProj != null)
-            {
-                existingProj.Projname = project.Projname;
-                existingProj.Deptid = project.Deptid;
-                await _context.SaveChangesAsync();
-            }
+            _context.Projects.Update(project);
+            await _context.SaveChangesAsync();
         }
 
         public async Task DeleteProjectAsync(int projId)

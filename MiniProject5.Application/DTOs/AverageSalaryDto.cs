@@ -8,6 +8,7 @@ namespace MiniProject8.Application.DTOs
 {
     public class AverageSalaryDto
     {
+        public int? DeptId { get; set; }
         public string DeptName { get; set; } = null!;
         public double AverageSalary { get; set; }
     }

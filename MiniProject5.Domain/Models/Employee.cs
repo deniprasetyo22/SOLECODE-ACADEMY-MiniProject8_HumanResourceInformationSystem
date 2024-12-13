@@ -4,11 +4,8 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
-using MiniProject5.Application.DTOs;
-using MiniProject6.Domain.Models;
-using MiniProject6.Persistence.Models;
 
-namespace MiniProject5.Persistence.Models;
+namespace MiniProject8.Domain.Models;
 
 [Table("employee")]
 [Index("Ssn", Name = "employee_ssn_key", IsUnique = true)]
@@ -71,7 +68,6 @@ public partial class Employee
 
     [ForeignKey("SupervisorId")]
     [InverseProperty("Subordinates")]
-    [JsonIgnore]
     public virtual Employee? Supervisor { get; set; }
 
     [InverseProperty("Supervisor")]
@@ -89,7 +85,6 @@ public partial class Employee
     public DateTime? Lastupdateddate { get; set; } = DateTime.Now;
 
     [InverseProperty("Mgremp")]
-    [JsonIgnore]
     public virtual ICollection<Department>? Departments { get; set; }
 
     [InverseProperty("Emp")]
@@ -97,7 +92,6 @@ public partial class Employee
 
     [ForeignKey("Deptid")]
     [InverseProperty("Employees")]
-    [JsonIgnore]
     public virtual Department? Dept { get; set; }
 
     [InverseProperty("Emp")]

@@ -3,7 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using MiniProject5.Persistence.Context;
+using MiniProject8.Persistence.Context;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
@@ -154,7 +154,77 @@ namespace MiniProject8.Persistence.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("MiniProject5.Persistence.Models.Department", b =>
+            modelBuilder.Entity("MiniProject8.Domain.Models.AppUser", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<int>("AccessFailedCount")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("RefreshToken")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("RefreshTokenExpiryTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("UserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedEmail")
+                        .HasDatabaseName("EmailIndex");
+
+                    b.HasIndex("NormalizedUserName")
+                        .IsUnique()
+                        .HasDatabaseName("UserNameIndex");
+
+                    b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("MiniProject8.Domain.Models.Department", b =>
                 {
                     b.Property<int>("Deptid")
                         .ValueGeneratedOnAdd()
@@ -180,7 +250,7 @@ namespace MiniProject8.Persistence.Migrations
                     b.ToTable("department");
                 });
 
-            modelBuilder.Entity("MiniProject5.Persistence.Models.Dependent", b =>
+            modelBuilder.Entity("MiniProject8.Domain.Models.Dependent", b =>
                 {
                     b.Property<int>("Dependentid")
                         .ValueGeneratedOnAdd()
@@ -228,7 +298,7 @@ namespace MiniProject8.Persistence.Migrations
                     b.ToTable("dependent");
                 });
 
-            modelBuilder.Entity("MiniProject5.Persistence.Models.Employee", b =>
+            modelBuilder.Entity("MiniProject8.Domain.Models.Employee", b =>
                 {
                     b.Property<int>("Empid")
                         .ValueGeneratedOnAdd()
@@ -344,162 +414,7 @@ namespace MiniProject8.Persistence.Migrations
                     b.ToTable("employee");
                 });
 
-            modelBuilder.Entity("MiniProject5.Persistence.Models.Location", b =>
-                {
-                    b.Property<int>("Locationid")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("locationid");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Locationid"));
-
-                    b.Property<string>("Address")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
-                        .HasColumnName("address");
-
-                    b.Property<int?>("Deptid")
-                        .HasColumnType("integer")
-                        .HasColumnName("deptid");
-
-                    b.HasKey("Locationid");
-
-                    b.HasIndex("Deptid");
-
-                    b.ToTable("location");
-                });
-
-            modelBuilder.Entity("MiniProject5.Persistence.Models.Project", b =>
-                {
-                    b.Property<int>("Projid")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("projid");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Projid"));
-
-                    b.Property<int>("Deptid")
-                        .HasColumnType("integer")
-                        .HasColumnName("deptid");
-
-                    b.Property<string>("Projname")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
-                        .HasColumnName("projname");
-
-                    b.HasKey("Projid");
-
-                    b.HasIndex("Deptid");
-
-                    b.ToTable("project");
-                });
-
-            modelBuilder.Entity("MiniProject5.Persistence.Models.Workson", b =>
-                {
-                    b.Property<int>("Empid")
-                        .HasColumnType("integer")
-                        .HasColumnName("empid");
-
-                    b.Property<int>("Projid")
-                        .HasColumnType("integer")
-                        .HasColumnName("projid");
-
-                    b.Property<DateOnly>("Dateworked")
-                        .HasColumnType("date")
-                        .HasColumnName("dateworked");
-
-                    b.Property<int?>("Hoursworked")
-                        .HasColumnType("integer")
-                        .HasColumnName("hoursworked");
-
-                    b.Property<string>("Userid")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
-                        .HasColumnName("userid");
-
-                    b.HasKey("Empid", "Projid");
-
-                    b.HasIndex("Projid");
-
-                    b.HasIndex("Userid")
-                        .IsUnique();
-
-                    b.ToTable("workson");
-                });
-
-            modelBuilder.Entity("MiniProject6.Domain.Models.AppUser", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
-
-                    b.Property<int>("AccessFailedCount")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Email")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("LockoutEnabled")
-                        .HasColumnType("boolean");
-
-                    b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("NormalizedEmail")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.Property<string>("NormalizedUserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.Property<string>("PasswordHash")
-                        .HasColumnType("text");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("text");
-
-                    b.Property<bool>("PhoneNumberConfirmed")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("RefreshToken")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("RefreshTokenExpiryTime")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("SecurityStamp")
-                        .HasColumnType("text");
-
-                    b.Property<bool>("TwoFactorEnabled")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("UserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NormalizedEmail")
-                        .HasDatabaseName("EmailIndex");
-
-                    b.HasIndex("NormalizedUserName")
-                        .IsUnique()
-                        .HasDatabaseName("UserNameIndex");
-
-                    b.ToTable("AspNetUsers", (string)null);
-                });
-
-            modelBuilder.Entity("MiniProject6.Persistence.Models.Leaverequest", b =>
+            modelBuilder.Entity("MiniProject8.Domain.Models.Leaverequest", b =>
                 {
                     b.Property<int>("Requestid")
                         .ValueGeneratedOnAdd()
@@ -519,6 +434,10 @@ namespace MiniProject8.Persistence.Migrations
                     b.Property<DateTime?>("Enddate")
                         .HasColumnType("timestamp without time zone")
                         .HasColumnName("enddate");
+
+                    b.Property<string>("File")
+                        .HasColumnType("text")
+                        .HasColumnName("file");
 
                     b.Property<string>("Leavetype")
                         .IsRequired()
@@ -545,6 +464,10 @@ namespace MiniProject8.Persistence.Migrations
                         .HasColumnType("timestamp without time zone")
                         .HasColumnName("startdate");
 
+                    b.Property<int>("Totaldays")
+                        .HasColumnType("integer")
+                        .HasColumnName("totaldays");
+
                     b.HasKey("Requestid");
 
                     b.HasIndex("Empid");
@@ -554,7 +477,33 @@ namespace MiniProject8.Persistence.Migrations
                     b.ToTable("leaverequest");
                 });
 
-            modelBuilder.Entity("MiniProject6.Persistence.Models.Nextsteprule", b =>
+            modelBuilder.Entity("MiniProject8.Domain.Models.Location", b =>
+                {
+                    b.Property<int>("Locationid")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("locationid");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Locationid"));
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("address");
+
+                    b.Property<int?>("Deptid")
+                        .HasColumnType("integer")
+                        .HasColumnName("deptid");
+
+                    b.HasKey("Locationid");
+
+                    b.HasIndex("Deptid");
+
+                    b.ToTable("location");
+                });
+
+            modelBuilder.Entity("MiniProject8.Domain.Models.Nextsteprule", b =>
                 {
                     b.Property<int>("Ruleid")
                         .ValueGeneratedOnAdd()
@@ -590,7 +539,7 @@ namespace MiniProject8.Persistence.Migrations
                     b.ToTable("nextsteprules");
                 });
 
-            modelBuilder.Entity("MiniProject6.Persistence.Models.Process", b =>
+            modelBuilder.Entity("MiniProject8.Domain.Models.Process", b =>
                 {
                     b.Property<int>("Processid")
                         .ValueGeneratedOnAdd()
@@ -637,7 +586,33 @@ namespace MiniProject8.Persistence.Migrations
                     b.ToTable("process");
                 });
 
-            modelBuilder.Entity("MiniProject6.Persistence.Models.Workflow", b =>
+            modelBuilder.Entity("MiniProject8.Domain.Models.Project", b =>
+                {
+                    b.Property<int>("Projid")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("projid");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Projid"));
+
+                    b.Property<int>("Deptid")
+                        .HasColumnType("integer")
+                        .HasColumnName("deptid");
+
+                    b.Property<string>("Projname")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("projname");
+
+                    b.HasKey("Projid");
+
+                    b.HasIndex("Deptid");
+
+                    b.ToTable("project");
+                });
+
+            modelBuilder.Entity("MiniProject8.Domain.Models.Workflow", b =>
                 {
                     b.Property<int>("Workflowid")
                         .ValueGeneratedOnAdd()
@@ -660,7 +635,7 @@ namespace MiniProject8.Persistence.Migrations
                     b.ToTable("workflow");
                 });
 
-            modelBuilder.Entity("MiniProject6.Persistence.Models.Workflowaction", b =>
+            modelBuilder.Entity("MiniProject8.Domain.Models.Workflowaction", b =>
                 {
                     b.Property<int>("Actionid")
                         .ValueGeneratedOnAdd()
@@ -706,7 +681,7 @@ namespace MiniProject8.Persistence.Migrations
                     b.ToTable("workflowactions");
                 });
 
-            modelBuilder.Entity("MiniProject6.Persistence.Models.Workflowsequence", b =>
+            modelBuilder.Entity("MiniProject8.Domain.Models.Workflowsequence", b =>
                 {
                     b.Property<int>("Stepid")
                         .ValueGeneratedOnAdd()
@@ -742,6 +717,39 @@ namespace MiniProject8.Persistence.Migrations
                     b.ToTable("workflowsequences");
                 });
 
+            modelBuilder.Entity("MiniProject8.Domain.Models.Workson", b =>
+                {
+                    b.Property<int>("Empid")
+                        .HasColumnType("integer")
+                        .HasColumnName("empid");
+
+                    b.Property<int>("Projid")
+                        .HasColumnType("integer")
+                        .HasColumnName("projid");
+
+                    b.Property<DateOnly>("Dateworked")
+                        .HasColumnType("date")
+                        .HasColumnName("dateworked");
+
+                    b.Property<int?>("Hoursworked")
+                        .HasColumnType("integer")
+                        .HasColumnName("hoursworked");
+
+                    b.Property<string>("Userid")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("userid");
+
+                    b.HasKey("Empid", "Projid");
+
+                    b.HasIndex("Projid");
+
+                    b.HasIndex("Userid")
+                        .IsUnique();
+
+                    b.ToTable("workson");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -753,7 +761,7 @@ namespace MiniProject8.Persistence.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("MiniProject6.Domain.Models.AppUser", null)
+                    b.HasOne("MiniProject8.Domain.Models.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -762,7 +770,7 @@ namespace MiniProject8.Persistence.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("MiniProject6.Domain.Models.AppUser", null)
+                    b.HasOne("MiniProject8.Domain.Models.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -777,7 +785,7 @@ namespace MiniProject8.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("MiniProject6.Domain.Models.AppUser", null)
+                    b.HasOne("MiniProject8.Domain.Models.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -786,44 +794,44 @@ namespace MiniProject8.Persistence.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("MiniProject6.Domain.Models.AppUser", null)
+                    b.HasOne("MiniProject8.Domain.Models.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("MiniProject5.Persistence.Models.Department", b =>
+            modelBuilder.Entity("MiniProject8.Domain.Models.Department", b =>
                 {
-                    b.HasOne("MiniProject5.Persistence.Models.Employee", "Mgremp")
+                    b.HasOne("MiniProject8.Domain.Models.Employee", "Mgremp")
                         .WithMany("Departments")
                         .HasForeignKey("Mgrempid");
 
                     b.Navigation("Mgremp");
                 });
 
-            modelBuilder.Entity("MiniProject5.Persistence.Models.Dependent", b =>
+            modelBuilder.Entity("MiniProject8.Domain.Models.Dependent", b =>
                 {
-                    b.HasOne("MiniProject5.Persistence.Models.Employee", "Emp")
+                    b.HasOne("MiniProject8.Domain.Models.Employee", "Emp")
                         .WithMany("Dependents")
                         .HasForeignKey("Empid");
 
                     b.Navigation("Emp");
                 });
 
-            modelBuilder.Entity("MiniProject5.Persistence.Models.Employee", b =>
+            modelBuilder.Entity("MiniProject8.Domain.Models.Employee", b =>
                 {
-                    b.HasOne("MiniProject5.Persistence.Models.Department", "Dept")
+                    b.HasOne("MiniProject8.Domain.Models.Department", "Dept")
                         .WithMany("Employees")
                         .HasForeignKey("Deptid");
 
-                    b.HasOne("MiniProject5.Persistence.Models.Employee", "Supervisor")
+                    b.HasOne("MiniProject8.Domain.Models.Employee", "Supervisor")
                         .WithMany("Subordinates")
                         .HasForeignKey("SupervisorId");
 
-                    b.HasOne("MiniProject6.Domain.Models.AppUser", "AppUser")
+                    b.HasOne("MiniProject8.Domain.Models.AppUser", "AppUser")
                         .WithOne("Employee")
-                        .HasForeignKey("MiniProject5.Persistence.Models.Employee", "userId");
+                        .HasForeignKey("MiniProject8.Domain.Models.Employee", "userId");
 
                     b.Navigation("AppUser");
 
@@ -832,58 +840,13 @@ namespace MiniProject8.Persistence.Migrations
                     b.Navigation("Supervisor");
                 });
 
-            modelBuilder.Entity("MiniProject5.Persistence.Models.Location", b =>
+            modelBuilder.Entity("MiniProject8.Domain.Models.Leaverequest", b =>
                 {
-                    b.HasOne("MiniProject5.Persistence.Models.Department", "Dept")
-                        .WithMany("Locations")
-                        .HasForeignKey("Deptid");
-
-                    b.Navigation("Dept");
-                });
-
-            modelBuilder.Entity("MiniProject5.Persistence.Models.Project", b =>
-                {
-                    b.HasOne("MiniProject5.Persistence.Models.Department", "Dept")
-                        .WithMany("Projects")
-                        .HasForeignKey("Deptid")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Dept");
-                });
-
-            modelBuilder.Entity("MiniProject5.Persistence.Models.Workson", b =>
-                {
-                    b.HasOne("MiniProject5.Persistence.Models.Employee", "Emp")
-                        .WithMany("Worksons")
-                        .HasForeignKey("Empid")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MiniProject5.Persistence.Models.Project", "Proj")
-                        .WithMany("Worksons")
-                        .HasForeignKey("Projid")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MiniProject6.Domain.Models.AppUser", "AppUser")
-                        .WithOne("Worksons")
-                        .HasForeignKey("MiniProject5.Persistence.Models.Workson", "Userid");
-
-                    b.Navigation("AppUser");
-
-                    b.Navigation("Emp");
-
-                    b.Navigation("Proj");
-                });
-
-            modelBuilder.Entity("MiniProject6.Persistence.Models.Leaverequest", b =>
-                {
-                    b.HasOne("MiniProject5.Persistence.Models.Employee", "Emp")
+                    b.HasOne("MiniProject8.Domain.Models.Employee", "Emp")
                         .WithMany("Leaverequests")
                         .HasForeignKey("Empid");
 
-                    b.HasOne("MiniProject6.Persistence.Models.Process", "Process")
+                    b.HasOne("MiniProject8.Domain.Models.Process", "Process")
                         .WithMany("Leaverequests")
                         .HasForeignKey("Processid");
 
@@ -892,13 +855,22 @@ namespace MiniProject8.Persistence.Migrations
                     b.Navigation("Process");
                 });
 
-            modelBuilder.Entity("MiniProject6.Persistence.Models.Nextsteprule", b =>
+            modelBuilder.Entity("MiniProject8.Domain.Models.Location", b =>
                 {
-                    b.HasOne("MiniProject6.Persistence.Models.Workflowsequence", "Currentstep")
+                    b.HasOne("MiniProject8.Domain.Models.Department", "Dept")
+                        .WithMany("Locations")
+                        .HasForeignKey("Deptid");
+
+                    b.Navigation("Dept");
+                });
+
+            modelBuilder.Entity("MiniProject8.Domain.Models.Nextsteprule", b =>
+                {
+                    b.HasOne("MiniProject8.Domain.Models.Workflowsequence", "Currentstep")
                         .WithMany("NextstepruleCurrentsteps")
                         .HasForeignKey("Currentstepid");
 
-                    b.HasOne("MiniProject6.Persistence.Models.Workflowsequence", "Nextstep")
+                    b.HasOne("MiniProject8.Domain.Models.Workflowsequence", "Nextstep")
                         .WithMany("NextstepruleNextsteps")
                         .HasForeignKey("Nextstepid");
 
@@ -907,17 +879,17 @@ namespace MiniProject8.Persistence.Migrations
                     b.Navigation("Nextstep");
                 });
 
-            modelBuilder.Entity("MiniProject6.Persistence.Models.Process", b =>
+            modelBuilder.Entity("MiniProject8.Domain.Models.Process", b =>
                 {
-                    b.HasOne("MiniProject6.Persistence.Models.Workflowsequence", "Currentstep")
+                    b.HasOne("MiniProject8.Domain.Models.Workflowsequence", "Currentstep")
                         .WithMany("Processes")
                         .HasForeignKey("Currentstepid");
 
-                    b.HasOne("MiniProject6.Domain.Models.AppUser", "Requester")
+                    b.HasOne("MiniProject8.Domain.Models.AppUser", "Requester")
                         .WithMany("Processes")
                         .HasForeignKey("Requesterid");
 
-                    b.HasOne("MiniProject6.Persistence.Models.Workflow", "Workflow")
+                    b.HasOne("MiniProject8.Domain.Models.Workflow", "Workflow")
                         .WithMany("Processes")
                         .HasForeignKey("Workflowid");
 
@@ -928,17 +900,28 @@ namespace MiniProject8.Persistence.Migrations
                     b.Navigation("Workflow");
                 });
 
-            modelBuilder.Entity("MiniProject6.Persistence.Models.Workflowaction", b =>
+            modelBuilder.Entity("MiniProject8.Domain.Models.Project", b =>
                 {
-                    b.HasOne("MiniProject6.Domain.Models.AppUser", "Actor")
+                    b.HasOne("MiniProject8.Domain.Models.Department", "Dept")
+                        .WithMany("Projects")
+                        .HasForeignKey("Deptid")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Dept");
+                });
+
+            modelBuilder.Entity("MiniProject8.Domain.Models.Workflowaction", b =>
+                {
+                    b.HasOne("MiniProject8.Domain.Models.AppUser", "Actor")
                         .WithMany("Workflowactions")
                         .HasForeignKey("Actorid");
 
-                    b.HasOne("MiniProject6.Persistence.Models.Process", "Process")
+                    b.HasOne("MiniProject8.Domain.Models.Process", "Process")
                         .WithMany("Workflowactions")
                         .HasForeignKey("Processid");
 
-                    b.HasOne("MiniProject6.Persistence.Models.Workflowsequence", "Step")
+                    b.HasOne("MiniProject8.Domain.Models.Workflowsequence", "Step")
                         .WithMany("Workflowactions")
                         .HasForeignKey("Stepid");
 
@@ -949,13 +932,13 @@ namespace MiniProject8.Persistence.Migrations
                     b.Navigation("Step");
                 });
 
-            modelBuilder.Entity("MiniProject6.Persistence.Models.Workflowsequence", b =>
+            modelBuilder.Entity("MiniProject8.Domain.Models.Workflowsequence", b =>
                 {
-                    b.HasOne("MiniProject6.Domain.Models.AppUser", "RequiredroleNavigation")
+                    b.HasOne("MiniProject8.Domain.Models.AppUser", "RequiredroleNavigation")
                         .WithMany("Workflowsequences")
                         .HasForeignKey("Requiredrole");
 
-                    b.HasOne("MiniProject6.Persistence.Models.Workflow", "Workflow")
+                    b.HasOne("MiniProject8.Domain.Models.Workflow", "Workflow")
                         .WithMany("Workflowsequences")
                         .HasForeignKey("Workflowid");
 
@@ -964,34 +947,32 @@ namespace MiniProject8.Persistence.Migrations
                     b.Navigation("Workflow");
                 });
 
-            modelBuilder.Entity("MiniProject5.Persistence.Models.Department", b =>
+            modelBuilder.Entity("MiniProject8.Domain.Models.Workson", b =>
                 {
-                    b.Navigation("Employees");
+                    b.HasOne("MiniProject8.Domain.Models.Employee", "Emp")
+                        .WithMany("Worksons")
+                        .HasForeignKey("Empid")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("Locations");
+                    b.HasOne("MiniProject8.Domain.Models.Project", "Proj")
+                        .WithMany("Worksons")
+                        .HasForeignKey("Projid")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("Projects");
+                    b.HasOne("MiniProject8.Domain.Models.AppUser", "AppUser")
+                        .WithOne("Worksons")
+                        .HasForeignKey("MiniProject8.Domain.Models.Workson", "Userid");
+
+                    b.Navigation("AppUser");
+
+                    b.Navigation("Emp");
+
+                    b.Navigation("Proj");
                 });
 
-            modelBuilder.Entity("MiniProject5.Persistence.Models.Employee", b =>
-                {
-                    b.Navigation("Departments");
-
-                    b.Navigation("Dependents");
-
-                    b.Navigation("Leaverequests");
-
-                    b.Navigation("Subordinates");
-
-                    b.Navigation("Worksons");
-                });
-
-            modelBuilder.Entity("MiniProject5.Persistence.Models.Project", b =>
-                {
-                    b.Navigation("Worksons");
-                });
-
-            modelBuilder.Entity("MiniProject6.Domain.Models.AppUser", b =>
+            modelBuilder.Entity("MiniProject8.Domain.Models.AppUser", b =>
                 {
                     b.Navigation("Employee");
 
@@ -1004,21 +985,48 @@ namespace MiniProject8.Persistence.Migrations
                     b.Navigation("Worksons");
                 });
 
-            modelBuilder.Entity("MiniProject6.Persistence.Models.Process", b =>
+            modelBuilder.Entity("MiniProject8.Domain.Models.Department", b =>
+                {
+                    b.Navigation("Employees");
+
+                    b.Navigation("Locations");
+
+                    b.Navigation("Projects");
+                });
+
+            modelBuilder.Entity("MiniProject8.Domain.Models.Employee", b =>
+                {
+                    b.Navigation("Departments");
+
+                    b.Navigation("Dependents");
+
+                    b.Navigation("Leaverequests");
+
+                    b.Navigation("Subordinates");
+
+                    b.Navigation("Worksons");
+                });
+
+            modelBuilder.Entity("MiniProject8.Domain.Models.Process", b =>
                 {
                     b.Navigation("Leaverequests");
 
                     b.Navigation("Workflowactions");
                 });
 
-            modelBuilder.Entity("MiniProject6.Persistence.Models.Workflow", b =>
+            modelBuilder.Entity("MiniProject8.Domain.Models.Project", b =>
+                {
+                    b.Navigation("Worksons");
+                });
+
+            modelBuilder.Entity("MiniProject8.Domain.Models.Workflow", b =>
                 {
                     b.Navigation("Processes");
 
                     b.Navigation("Workflowsequences");
                 });
 
-            modelBuilder.Entity("MiniProject6.Persistence.Models.Workflowsequence", b =>
+            modelBuilder.Entity("MiniProject8.Domain.Models.Workflowsequence", b =>
                 {
                     b.Navigation("NextstepruleCurrentsteps");
 
